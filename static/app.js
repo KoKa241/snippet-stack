@@ -1,0 +1,16 @@
+const toast = (message) => { const el = document.querySelector('.toast'); el.textContent = message; el.hidden = false; clearTimeout(window.toastTimer); window.toastTimer = setTimeout(() => el.hidden = true, 3000); };
+document.querySelectorAll('.theme-toggle').forEach(button => button.addEventListener('click', () => { const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = theme; try { localStorage.setItem('theme', theme); } catch (_) {} }));
+document.querySelectorAll('[data-copy]').forEach(button => button.addEventListener('click', async () => { try { await navigator.clipboard.writeText(JSON.parse(document.getElementById(button.dataset.copy).textContent)); toast('Код скопирован'); } catch (_) { toast('Не удалось скопировать. Откройте редактор и скопируйте код вручную.'); } }));
+document.querySelectorAll('.auto-submit').forEach(select => select.addEventListener('change', () => select.form.requestSubmit()));
+const dialog = document.getElementById('delete-dialog');
+document.querySelectorAll('[data-delete]').forEach(button => button.addEventListener('click', () => { document.getElementById('delete-form').action = button.dataset.delete; dialog.showModal(); }));
+document.getElementById('cancel-delete').addEventListener('click', () => dialog.close());
+document.addEventListener('keydown', event => { const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName); if (event.key === '/' && !typing) { const search = document.getElementById('search'); if (search) { event.preventDefault(); search.focus(); } } if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') { document.querySelector('.editor-form')?.requestSubmit(); } });
+const editor = document.getElementById('id_code');
+if (editor) editor.addEventListener('keydown', event => { if (event.key === 'Tab' && !event.shiftKey) { event.preventDefault(); editor.setRangeText('    ', editor.selectionStart, editor.selectionEnd, 'end'); editor.dispatchEvent(new Event('input', {bubbles:true})); } });
+let dirty = false;
+const editorForm = document.querySelector('.editor-form');
+editorForm?.addEventListener('input', () => dirty = true);
+editorForm?.addEventListener('submit', () => dirty = false);
+window.addEventListener('beforeunload', event => { if (dirty) { event.preventDefault(); event.returnValue = ''; } });
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
