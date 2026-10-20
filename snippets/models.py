@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
-LANGUAGES = [('python', 'Python'), ('shell', 'Terminal'), ('javascript', 'JavaScript'), ('typescript', 'TypeScript'), ('sql', 'SQL'), ('html', 'HTML'), ('css', 'CSS'), ('json', 'JSON'), ('yaml', 'YAML'), ('other', 'Plain text')]
+LANGUAGES = [('python', 'Python'), ('shell', _('Terminal')), ('javascript', 'JavaScript'), ('typescript', 'TypeScript'), ('sql', 'SQL'), ('html', 'HTML'), ('css', 'CSS'), ('json', 'JSON'), ('yaml', 'YAML'), ('other', _('Plain text'))]
 
 class Tag(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -37,3 +38,29 @@ class SearchDocument(models.Model):
     content_hash = models.CharField(max_length=64)
     embedding = models.BinaryField(null=True, editable=False)
     embedding_model = models.CharField(max_length=200, blank=True)
+
+
+class UserPreference(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True)
+    language = models.CharField(max_length=2, choices=settings.LANGUAGES, default='en')
+
+
+class APIKey(models.Model):
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    name = models.CharField(max_length=60)
+    prefix = models.CharField(max_length=11)
+    digest = models.CharField(max_length=64, unique=True, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    revoked_at = models.DateTimeField(null=True, blank=True)
+    last_used_at = models.DateTimeField(null=True, blank=True)
+    window_started_at = models.DateTimeField(null=True, editable=False)
+    window_requests = models.PositiveIntegerField(default=0, editable=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    @property
+    def is_active(self):
+        from django.utils import timezone
+        return self.revoked_at is None and self.expires_at > timezone.now()

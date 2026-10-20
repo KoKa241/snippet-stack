@@ -1,0 +1,747 @@
+msgid ""
+msgstr ""
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-20 22:08+0000\n"
+"Language: ru\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: config/settings.py:25
+msgid "English"
+msgstr "Английский"
+
+#: config/settings.py:25
+msgid "Russian"
+msgstr "Русский"
+
+#: snippets/forms.py:8
+msgid "Interface language"
+msgstr "Язык интерфейса"
+
+#: snippets/forms.py:13 snippets/forms.py:30 templates/edit.html:9
+msgid "Code"
+msgstr "Код"
+
+#: snippets/forms.py:16
+msgid "# Your next useful snippet"
+msgstr "# Ваш следующий полезный сниппет"
+
+#: snippets/forms.py:20
+msgid "Tags"
+msgstr "Теги"
+
+#: snippets/forms.py:21
+msgid "Up to 10 comma-separated tags"
+msgstr "До 10 тегов через запятую"
+
+#: snippets/forms.py:29 templates/home.html:16
+msgid "Title"
+msgstr "Название"
+
+#: snippets/forms.py:29
+msgid "Description"
+msgstr "Описание"
+
+#: snippets/forms.py:30 templates/home.html:13 templates/settings.html:13
+msgid "Language"
+msgstr "Язык"
+
+#: snippets/forms.py:33
+msgid "What is this snippet useful for?"
+msgstr "Для чего пригодится этот сниппет?"
+
+#: snippets/forms.py:34
+msgid "For example, an HTTP request with retries"
+msgstr "Например, HTTP-запрос с повторными попытками"
+
+#: snippets/forms.py:40 snippets/test_preferences.py:111
+msgid "Use up to 10 tags, each at most 32 characters long."
+msgstr "Не больше 10 тегов, каждый до 32 символов."
+
+#: snippets/forms.py:52
+msgid "Key name"
+msgstr "Название ключа"
+
+#: snippets/forms.py:53
+msgid "For example, terminal or editor"
+msgstr "Например, терминал или редактор"
+
+#: snippets/forms.py:54
+msgid "Expires after"
+msgstr "Срок действия"
+
+#: snippets/forms.py:55
+msgid "30 days"
+msgstr "30 дней"
+
+#: snippets/forms.py:55
+msgid "90 days"
+msgstr "90 дней"
+
+#: snippets/forms.py:55
+msgid "1 year"
+msgstr "1 год"
+
+#: snippets/forms.py:69 snippets/forms.py:83
+msgid "Archive password"
+msgstr "Пароль архива"
+
+#: snippets/forms.py:71
+msgid "Confirm archive password"
+msgstr "Повторите пароль архива"
+
+#: snippets/forms.py:77
+msgid "Passwords do not match."
+msgstr "Пароли не совпадают."
+
+#: snippets/forms.py:82
+msgid "Encrypted archive"
+msgstr "Зашифрованный архив"
+
+#: snippets/forms.py:90
+msgid "The archive must not exceed 10 MiB."
+msgstr "Размер архива не должен превышать 10 МиБ."
+
+#: snippets/management/commands/build_locale_assets.py:12
+msgid "You are offline"
+msgstr "Вы не в сети"
+
+#: snippets/management/commands/build_locale_assets.py:13
+msgid ""
+"Connect to the server to access your private snippets. Your data is saved."
+msgstr ""
+"Для доступа к личным сниппетам требуется подключение к серверу. Ваши данные "
+"сохранены."
+
+#: snippets/management/commands/build_locale_assets.py:14
+msgid "Try again"
+msgstr "Попробовать снова"
+
+#: snippets/management/commands/build_locale_assets.py:15
+msgid "Offline · Snippet Stack"
+msgstr "Нет подключения · Snippet Stack"
+
+#: snippets/management/commands/build_locale_assets.py:17
+msgid "Your personal collection of code and commands"
+msgstr "Ваш личный набор кода и команд"
+
+#: snippets/models.py:5 snippets/views.py:47
+msgid "Terminal"
+msgstr "Терминал"
+
+#: snippets/models.py:5
+msgid "Plain text"
+msgstr "Обычный текст"
+
+#: snippets/test_preferences.py:39 templates/registration/login.html:2
+#: templates/registration/login.html:12 templates/registration/register.html:14
+msgid "Log in"
+msgstr "Войти"
+
+#: snippets/test_preferences.py:40
+msgid "Username"
+msgstr ""
+
+#: snippets/test_preferences.py:54 templates/base.html:24 templates/home.html:6
+msgid "All snippets"
+msgstr "Все сниппеты"
+
+#: snippets/test_preferences.py:113 snippets/views.py:56
+msgid "Snippet saved."
+msgstr "Сниппет сохранён."
+
+#: snippets/views.py:25
+msgid "Account created. Log in to your stack."
+msgstr "Аккаунт создан. Войдите в свой стек."
+
+#: snippets/views.py:64
+msgid "Snippet deleted."
+msgstr "Сниппет удалён."
+
+#: snippets/views.py:96
+msgid "Settings saved."
+msgstr "Настройки сохранены."
+
+#: snippets/views.py:130
+msgid ""
+"You can have up to 10 active keys. Revoke a key before creating another."
+msgstr ""
+"Можно создать до 10 активных ключей. Отзовите один из ключей, чтобы создать "
+"новый."
+
+#: snippets/views.py:145
+msgid "API key revoked."
+msgstr "API-ключ отозван."
+
+#: snippets/views.py:160
+msgid "Export supports up to 2,000 snippets and a 10 MiB archive."
+msgstr "Экспорт поддерживает до 2000 сниппетов и архив размером до 10 МиБ."
+
+#: snippets/views.py:180
+msgid ""
+"Cannot import this archive. Check the password and use a valid Snippet Stack "
+"backup. No data was changed."
+msgstr "Не удалось импортировать архив. Проверьте пароль и выберите корректную резервную копию Snippet Stack. Данные не изменены."
+
+#: snippets/views.py:182
+#, python-format
+msgid "Import complete: %(created)s added, %(skipped)s duplicates skipped."
+msgstr "Импорт завершён: добавлено %(created)s, пропущено дубликатов %(skipped)s."
+
+#: templates/base.html:7
+msgid "Snippet Stack — your personal collection of code and commands."
+msgstr "Snippet Stack — ваш личный набор кода и команд."
+
+#: templates/base.html:17
+msgid "Skip to content"
+msgstr "Перейти к содержимому"
+
+#: templates/base.html:20
+msgid "Snippet Stack home"
+msgstr "Snippet Stack — главная"
+
+#: templates/base.html:21
+msgid "Personal workspace"
+msgstr "Личное пространство"
+
+#: templates/base.html:22
+msgid "LIBRARY"
+msgstr "БИБЛИОТЕКА"
+
+#: templates/base.html:25 templates/home.html:6
+msgid "Favorites"
+msgstr "Избранное"
+
+#: templates/base.html:26
+msgid "Commands"
+msgstr "Команды"
+
+#: templates/base.html:28
+msgid "TAGS"
+msgstr "ТЕГИ"
+
+#: templates/base.html:29
+msgid "Add tags when creating a snippet."
+msgstr "Добавьте теги при создании сниппета."
+
+#: templates/base.html:31
+msgid "Your code. In one place."
+msgstr "Ваш код. В одном месте."
+
+#: templates/base.html:33 templates/registration/login.html:17
+#: templates/registration/register.html:17 templates/settings.html:2
+#: templates/settings.html:5 templates/settings.html:7
+msgid "Settings"
+msgstr "Настройки"
+
+#: templates/base.html:35
+msgid "Log out"
+msgstr "Выйти"
+
+#: templates/base.html:44
+msgid "Code copied"
+msgstr "Код скопирован"
+
+#: templates/base.html:44
+msgid "Could not copy. Open the editor and copy the code manually."
+msgstr "Не удалось скопировать. Откройте редактор и скопируйте код вручную."
+
+#: templates/base.html:47
+msgid "Delete snippet?"
+msgstr "Удалить сниппет?"
+
+#: templates/base.html:48
+msgid "This action cannot be undone."
+msgstr "Восстановить его после удаления не получится."
+
+#: templates/base.html:49 templates/edit.html:10
+msgid "Cancel"
+msgstr "Отмена"
+
+#: templates/base.html:49 templates/home.html:31
+msgid "Delete"
+msgstr "Удалить"
+
+#: templates/components/theme_control.html:3
+#: templates/components/theme_control.html:4
+msgid "Theme"
+msgstr "Тема"
+
+#: templates/components/theme_control.html:6
+msgid "System"
+msgstr "Системная"
+
+#: templates/components/theme_control.html:7
+msgid "Light"
+msgstr "Светлая"
+
+#: templates/components/theme_control.html:8
+msgid "Dark"
+msgstr "Тёмная"
+
+#: templates/components/theme_control.html:10
+msgid ""
+"System follows your device appearance automatically. Saved in this browser."
+msgstr ""
+"Системная тема автоматически следует настройкам устройства. Выбор "
+"сохраняется в этом браузере."
+
+#: templates/edit.html:2 templates/edit.html:6
+msgid "Edit snippet"
+msgstr "Редактировать сниппет"
+
+#: templates/edit.html:2 templates/edit.html:6 templates/home.html:8
+msgid "New snippet"
+msgstr "Новый сниппет"
+
+#: templates/edit.html:4 templates/home.html:3
+msgid "Library"
+msgstr "Библиотека"
+
+#: templates/edit.html:4
+msgid "Your next useful snippet"
+msgstr "Ваш следующий полезный фрагмент"
+
+#: templates/edit.html:6
+msgid "SAVE IT FOR LATER"
+msgstr "СОХРАНИТЕ НА ПОТОМ"
+
+#: templates/edit.html:6
+msgid "Code, a command, or an idea — everything in its place."
+msgstr "Код, команда или идея — всё на своём месте."
+
+#: templates/edit.html:9
+msgid "Tab to indent · Ctrl/⌘ + Enter to save"
+msgstr "Tab — отступ · Ctrl/⌘ + Enter — сохранить"
+
+#: templates/edit.html:10
+msgid "Save snippet"
+msgstr "Сохранить сниппет"
+
+#: templates/home.html:3
+msgid "Workspace"
+msgstr "Рабочее пространство"
+
+#: templates/home.html:3
+msgid "Personal stack"
+msgstr "Личный стек"
+
+#: templates/home.html:5
+msgid "LESS SEARCHING. MORE CODING."
+msgstr "МЕНЬШЕ ПОИСКА. БОЛЬШЕ КОДА."
+
+#: templates/home.html:6
+msgid "Terminal commands"
+msgstr "Команды терминала"
+
+#: templates/home.html:7
+msgid "Useful code, always within reach. Build your stack."
+msgstr "Полезный код всегда под рукой. Соберите свой стек."
+
+#: templates/home.html:12
+msgid "What do you want to do? Try freeing a port…"
+msgstr "Что хотите сделать? Например, освободить порт…"
+
+#: templates/home.html:12
+msgid "Search snippets"
+msgstr "Поиск сниппетов"
+
+#: templates/home.html:13
+msgid "All languages"
+msgstr "Все языки"
+
+#: templates/home.html:14
+msgid "Sort order"
+msgstr "Сортировка"
+
+#: templates/home.html:15
+msgid "Relevance"
+msgstr "По релевантности"
+
+#: templates/home.html:15
+msgid "Default order"
+msgstr "По умолчанию"
+
+#: templates/home.html:16
+msgid "Recently updated"
+msgstr "Сначала новые"
+
+#: templates/home.html:17
+msgid "Search"
+msgstr "Найти"
+
+#: templates/home.html:19
+msgid "Keyword and semantic search."
+msgstr "Поиск по словам и смыслу."
+
+#: templates/home.html:19
+msgid ""
+"Semantic search is updating. New snippets are already searchable by keyword."
+msgstr "Смысловой поиск обновляется. Новые сниппеты уже доступны по словам."
+
+#: templates/home.html:19
+msgid "Semantic search is temporarily unavailable. Showing keyword matches."
+msgstr "Смысловой поиск временно недоступен. Показаны совпадения по словам."
+
+#: templates/home.html:19
+msgid "Keyword search."
+msgstr "Поиск по словам."
+
+#: templates/home.html:19
+msgid "Up to 200 best matches."
+msgstr "До 200 лучших совпадений."
+
+#: templates/home.html:20
+#, python-format
+msgid "Results for “%(q)s”"
+msgstr "Результаты для «%(q)s»"
+
+#: templates/home.html:20
+msgid "Everything worth keeping"
+msgstr "Всё, что стоит сохранить"
+
+#: templates/home.html:20
+msgid "Found:"
+msgstr "Найдено:"
+
+#: templates/home.html:21
+msgid "No description"
+msgstr "Без описания"
+
+#: templates/home.html:26
+msgid "Remove from favorites"
+msgstr "Убрать из избранного"
+
+#: templates/home.html:26
+msgid "Add to favorites"
+msgstr "В избранное"
+
+#: templates/home.html:29
+msgid "Copy code"
+msgstr "Копировать код"
+
+#: templates/home.html:30
+msgid "No tags"
+msgstr "Без тегов"
+
+#: templates/home.html:31
+msgid "Updated"
+msgstr "Обновлён"
+
+#: templates/home.html:31
+msgid "Edit"
+msgstr "Редактировать"
+
+#: templates/home.html:34
+msgid "YOUR PERSONAL TOOLKIT"
+msgstr "ВАШ ЛИЧНЫЙ НАБОР ИНСТРУМЕНТОВ"
+
+#: templates/home.html:35
+msgid "Nothing found yet"
+msgstr "Пока ничего не найдено"
+
+#: templates/home.html:35
+msgid "Good code deserves a home"
+msgstr "Хороший код заслуживает места"
+
+#: templates/home.html:36
+msgid "Try another search or reset your filters."
+msgstr "Попробуйте другой запрос или сбросьте фильтры."
+
+#: templates/home.html:36
+msgid "Save your first command or code snippet."
+msgstr "Сохраните первую команду или фрагмент кода."
+
+#: templates/home.html:36
+msgid "Next time, it will be one click away."
+msgstr "В следующий раз они будут в одном клике."
+
+#: templates/home.html:37
+msgid "Reset filters"
+msgstr "Сбросить фильтры"
+
+#: templates/home.html:37
+msgid "Create your first snippet"
+msgstr "Создать первый сниппет"
+
+#: templates/home.html:38
+msgid "Any language"
+msgstr "Любой язык"
+
+#: templates/home.html:38
+msgid "Organized with tags"
+msgstr "Удобные теги"
+
+#: templates/home.html:38
+msgid "Quick copy"
+msgstr "Быстрое копирование"
+
+#: templates/home.html:41
+msgid "Pages"
+msgstr "Страницы"
+
+#: templates/home.html:41
+msgid "Previous"
+msgstr "Назад"
+
+#: templates/home.html:41
+msgid "Next"
+msgstr "Далее"
+
+#: templates/home.html:42
+msgid "Collect knowledge, not open tabs."
+msgstr "Собирайте знания, а не открытые вкладки."
+
+#: templates/home.html:42
+msgid "Made for your flow"
+msgstr "Для вашего рабочего ритма"
+
+#: templates/registration/login.html:7
+msgid "GET BACK IN THE FLOW"
+msgstr "ВОЗВРАЩАЙТЕСЬ В ПОТОК"
+
+#: templates/registration/login.html:8
+msgid "Your code."
+msgstr "Ваш код."
+
+#: templates/registration/login.html:8
+msgid "Always within reach."
+msgstr "Всегда под рукой."
+
+#: templates/registration/login.html:9
+msgid "Log in to open your personal stack."
+msgstr "Войдите, чтобы открыть свой личный стек."
+
+#: templates/registration/login.html:14
+msgid "Don't have an account?"
+msgstr "Ещё нет аккаунта?"
+
+#: templates/registration/login.html:14 templates/registration/register.html:2
+#: templates/registration/register.html:12
+msgid "Create account"
+msgstr "Создать аккаунт"
+
+#: templates/registration/login.html:16 templates/registration/register.html:16
+msgid "Less searching. More coding."
+msgstr "Меньше поиска. Больше кода."
+
+#: templates/registration/register.html:7
+msgid "START YOUR STACK"
+msgstr "НАЧНИТЕ СВОЙ СТЕК"
+
+#: templates/registration/register.html:8
+msgid "A home for"
+msgstr "Место для"
+
+#: templates/registration/register.html:8
+msgid "useful code."
+msgstr "полезного кода."
+
+#: templates/registration/register.html:9
+msgid "Create an account and save your first find."
+msgstr "Создайте аккаунт и сохраните первую находку."
+
+#: templates/registration/register.html:14
+msgid "Already have an account?"
+msgstr "Уже есть аккаунт?"
+
+#: templates/settings.html:5
+msgid "Back to library"
+msgstr "Назад к сниппетам"
+
+#: templates/settings.html:7
+msgid "MAKE IT YOURS"
+msgstr "НАСТРОЙТЕ ПОД СЕБЯ"
+
+#: templates/settings.html:7
+msgid "Your workspace, your preferences."
+msgstr "Ваше пространство, ваши настройки."
+
+#: templates/settings.html:8
+msgid "Settings sections"
+msgstr "Разделы настроек"
+
+#: templates/settings.html:8 templates/settings.html:10
+msgid "Preferences"
+msgstr "Предпочтения"
+
+#: templates/settings.html:8 templates/settings.html:19
+msgid "API keys"
+msgstr "API-ключи"
+
+#: templates/settings.html:8 templates/settings.html:30
+msgid "Export & import"
+msgstr "Экспорт и импорт"
+
+#: templates/settings.html:8 templates/settings.html:38
+msgid "API quick start"
+msgstr "Начало работы с API"
+
+#: templates/settings.html:10
+msgid "Choose how Snippet Stack looks and feels."
+msgstr "Настройте Snippet Stack под себя."
+
+#: templates/settings.html:11
+msgid "Appearance"
+msgstr "Оформление"
+
+#: templates/settings.html:11
+msgid "A comfortable workspace, day or night."
+msgstr "Удобное пространство днём и ночью."
+
+#: templates/settings.html:13
+msgid "Saved to your account and available on your other devices."
+msgstr "Сохраняется в аккаунте и доступно на других устройствах."
+
+#: templates/settings.html:13
+msgid "Saved in this browser. Log in to save it to your account."
+msgstr ""
+"Сохраняется в этом браузере. Войдите, чтобы сохранить выбор в аккаунте."
+
+#: templates/settings.html:14
+msgid "Save settings"
+msgstr "Сохранить настройки"
+
+#: templates/settings.html:19
+msgid "Read only"
+msgstr "Только чтение"
+
+#: templates/settings.html:19
+msgid "Search and read your snippets from a terminal, editor, or integration."
+msgstr "Ищите и читайте свои сниппеты из терминала, редактора или интеграции."
+
+#: templates/settings.html:22
+msgid "Copy your new API key"
+msgstr "Скопируйте новый API-ключ"
+
+#: templates/settings.html:22
+msgid "This is the only time the full key is shown. Store it somewhere safe."
+msgstr ""
+"Полный ключ показывается только один раз. Сохраните его в надёжном месте."
+
+#: templates/settings.html:23
+msgid "API key copied"
+msgstr "API-ключ скопирован"
+
+#: templates/settings.html:23
+msgid "Copy key"
+msgstr "Копировать ключ"
+
+#: templates/settings.html:25
+msgid "Create key"
+msgstr "Создать ключ"
+
+#: templates/settings.html:26
+msgid "Revoked"
+msgstr "Отозван"
+
+#: templates/settings.html:26
+msgid "Active"
+msgstr "Активен"
+
+#: templates/settings.html:26
+msgid "Expired"
+msgstr "Истёк"
+
+#: templates/settings.html:26
+msgid "Expires"
+msgstr "Действует до"
+
+#: templates/settings.html:26
+msgid "Last used"
+msgstr "Последнее использование"
+
+#: templates/settings.html:26
+msgid "Never"
+msgstr "Ещё не использовался"
+
+#: templates/settings.html:26
+msgid "Revoke"
+msgstr "Отозвать"
+
+#: templates/settings.html:26
+msgid "No API keys yet"
+msgstr "API-ключей пока нет"
+
+#: templates/settings.html:26
+msgid "Create a named key for each tool you connect."
+msgstr "Создайте отдельный именованный ключ для каждого инструмента."
+
+#: templates/settings.html:27
+msgid ""
+"Up to 10 active keys. Each key allows 60 requests per minute. Revoking a key "
+"immediately prevents new requests."
+msgstr ""
+"До 10 активных ключей. Каждый ключ допускает 60 запросов в минуту. Отзыв "
+"ключа сразу блокирует новые запросы."
+
+#: templates/settings.html:30
+msgid ""
+"Back up your snippets, tags, favorites, and dates in a password-encrypted "
+"file."
+msgstr "Сохраните сниппеты, теги, избранное и даты в файл, зашифрованный паролем."
+
+#: templates/settings.html:31
+msgid ""
+"Use a separate password of at least 12 characters. Keep it safe: forgotten "
+"archive passwords cannot be recovered. Account passwords and API keys are "
+"never exported."
+msgstr "Используйте отдельный пароль длиной от 12 символов. Храните его в надёжном месте: забытый пароль архива восстановить нельзя. Пароли аккаунтов и API-ключи не экспортируются."
+
+#: templates/settings.html:33
+msgid "Export encrypted backup"
+msgstr "Экспорт зашифрованной копии"
+
+#: templates/settings.html:33
+msgid "Download backup"
+msgstr "Скачать резервную копию"
+
+#: templates/settings.html:34
+msgid "Import encrypted backup"
+msgstr "Импорт зашифрованной копии"
+
+#: templates/settings.html:34
+msgid ""
+"Adds snippets to this account without replacing existing entries. Exact "
+"duplicates are skipped. Maximum: 2,000 snippets and 10 MiB per file."
+msgstr "Добавляет сниппеты в этот аккаунт, не заменяя существующие записи. Точные дубликаты пропускаются. Максимум: 2000 сниппетов и 10 МиБ на файл."
+
+#: templates/settings.html:34
+msgid "Import backup"
+msgstr "Импортировать копию"
+
+#: templates/settings.html:36
+msgid ""
+"Encryption and decryption happen on your server. Use HTTPS when connecting "
+"remotely."
+msgstr "Шифрование и расшифровка выполняются на вашем сервере. Для удалённого подключения используйте HTTPS."
+
+#: templates/settings.html:38
+msgid ""
+"Send the key in the Authorization header. Replace the URL with your server "
+"address."
+msgstr ""
+"Передавайте ключ в заголовке Authorization. Замените URL адресом своего "
+"сервера."
+
+#: templates/settings.html:43
+msgid ""
+"Search or list your snippets. Supports q, language, tag, favorite, sort, "
+"page, and page_size."
+msgstr ""
+"Поиск или список ваших сниппетов. Поддерживает q, language, tag, favorite, "
+"sort, page и page_size."
+
+#: templates/settings.html:43
+msgid "Read a single snippet, including its full code."
+msgstr "Получение одного сниппета с полным кодом."
+
+#~ msgid "Toggle theme"
+#~ msgstr "Переключить тему"
+
+#~ msgid "Back"
+#~ msgstr "Назад"
+
+#~ msgid "Choose your interface language."
+#~ msgstr "Выберите язык интерфейса."

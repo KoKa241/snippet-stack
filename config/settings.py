@@ -1,13 +1,14 @@
 import os
 from pathlib import Path
 from datetime import timedelta
+from django.utils.translation import gettext_lazy as _
 BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
 SECRET_KEY = os.environ['SECRET_KEY']
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,[::1]').split(',')
 CSRF_TRUSTED_ORIGINS = list(filter(None, os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')))
 INSTALLED_APPS = ['django.contrib.auth', 'django.contrib.contenttypes', 'django.contrib.sessions', 'django.contrib.messages', 'django.contrib.staticfiles', 'axes', 'snippets']
-MIDDLEWARE = ['django.middleware.security.SecurityMiddleware', 'whitenoise.middleware.WhiteNoiseMiddleware', 'django.contrib.sessions.middleware.SessionMiddleware', 'django.middleware.common.CommonMiddleware', 'django.middleware.csrf.CsrfViewMiddleware', 'django.contrib.auth.middleware.AuthenticationMiddleware', 'django.contrib.messages.middleware.MessageMiddleware', 'django.middleware.clickjacking.XFrameOptionsMiddleware', 'axes.middleware.AxesMiddleware', 'snippets.middleware.HeadersMiddleware']
+MIDDLEWARE = ['django.middleware.security.SecurityMiddleware', 'whitenoise.middleware.WhiteNoiseMiddleware', 'django.contrib.sessions.middleware.SessionMiddleware', 'django.middleware.common.CommonMiddleware', 'django.middleware.csrf.CsrfViewMiddleware', 'django.contrib.auth.middleware.AuthenticationMiddleware', 'snippets.middleware.LanguageMiddleware', 'django.contrib.messages.middleware.MessageMiddleware', 'django.middleware.clickjacking.XFrameOptionsMiddleware', 'axes.middleware.AxesMiddleware', 'snippets.middleware.HeadersMiddleware']
 ROOT_URLCONF = 'config.urls'
 TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates', 'DIRS': [BASE_DIR / 'templates'], 'APP_DIRS': True, 'OPTIONS': {'context_processors': ['django.template.context_processors.request', 'django.contrib.auth.context_processors.auth', 'django.contrib.messages.context_processors.messages', 'snippets.context_processors.library']}}]
 WSGI_APPLICATION = 'config.wsgi.application'
@@ -20,7 +21,13 @@ AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = timedelta(minutes=15)
 AXES_LOCKOUT_PARAMETERS = ['ip_address']
 AXES_RESET_ON_SUCCESS = True
-LANGUAGE_CODE = 'ru'
+LANGUAGE_CODE = 'en'
+LANGUAGES = [('en', _('English')), ('ru', _('Russian'))]
+LOCALE_PATHS = [BASE_DIR / 'locale']
+USE_I18N = True
+LANGUAGE_COOKIE_NAME = 'snippet_language'
+LANGUAGE_COOKIE_AGE = 60 * 60 * 24 * 365
+LANGUAGE_COOKIE_SAMESITE = 'Lax'
 TIME_ZONE = 'UTC'
 USE_TZ = True
 STATIC_URL = '/static/'
@@ -55,3 +62,6 @@ SEARCH_SEMANTIC_ENABLED = os.getenv('SEARCH_SEMANTIC_ENABLED', 'true').lower() =
 SEARCH_THREADS = int(os.getenv('SEARCH_THREADS', '2'))
 SEARCH_CANDIDATES = 100
 SEARCH_MIN_SIMILARITY = float(os.getenv('SEARCH_MIN_SIMILARITY', '0.25'))
+
+# Shared database-backed fixed window: requests per key per 60 seconds.
+API_RATE_LIMIT = 60

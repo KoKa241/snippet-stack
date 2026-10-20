@@ -1,0 +1,11 @@
+{% load i18n %}
+<fieldset class="theme-fieldset">
+  <legend>{% translate "Theme" %}</legend>
+  <div class="theme-control" role="group" aria-label="{% translate 'Theme' %}">
+    <span class="theme-indicator" aria-hidden="true"></span>
+    <label><input type="radio" name="theme" value="system" checked><span>◐ {% translate "System" %}</span></label>
+    <label><input type="radio" name="theme" value="light"><span>☀ {% translate "Light" %}</span></label>
+    <label><input type="radio" name="theme" value="dark"><span>☾ {% translate "Dark" %}</span></label>
+  </div>
+  <p class="muted small">{% translate "System follows your device appearance automatically. Saved in this browser." %}</p>
+</fieldset>

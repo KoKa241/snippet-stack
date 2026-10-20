@@ -1,0 +1,48 @@
+{% extends 'base.html' %}{% load i18n %}
+{% block title %}{% translate "Settings" %} · Snippet Stack{% endblock %}
+{% block content %}
+<div class="settings-page {% if not user.is_authenticated %}guest-settings{% endif %}">
+  <header class="topbar"><a href="{% if user.is_authenticated %}/{% else %}{% url 'login' %}{% endif %}">← {% translate "Back to library" %}</a><span>{% translate "Settings" %}</span></header>
+  <section class="content settings-content">
+    <div class="page-heading"><div><p class="eyebrow accent">{% translate "MAKE IT YOURS" %}</p><h1>{% translate "Settings" %}</h1><p class="muted">{% translate "Your workspace, your preferences." %}</p></div></div>
+    <nav class="settings-sections" aria-label="{% translate 'Settings sections' %}"><a href="#preferences">{% translate "Preferences" %}</a>{% if user.is_authenticated %}<a href="#api-keys">{% translate "API keys" %}</a><a href="#backups">{% translate "Export & import" %}</a><a href="#api-example">{% translate "API quick start" %}</a>{% endif %}</nav>
+    <section class="settings-panel" id="preferences" aria-labelledby="preferences-heading">
+      <div class="section-heading"><h2 id="preferences-heading">{% translate "Preferences" %}</h2><p class="muted">{% translate "Choose how Snippet Stack looks and feels." %}</p></div>
+      <div class="preference-row"><div><h3>{% translate "Appearance" %}</h3><p class="muted small">{% translate "A comfortable workspace, day or night." %}</p></div>{% include 'components/theme_control.html' %}</div>
+      <form method="post" action="{% url 'settings' %}" class="preference-row">{% csrf_token %}
+        <div><h3>{% translate "Language" %}</h3><p class="muted small">{% if user.is_authenticated %}{% translate "Saved to your account and available on your other devices." %}{% else %}{% translate "Saved in this browser. Log in to save it to your account." %}{% endif %}</p></div>
+        <div class="preference-input">{{ form.non_field_errors }}<div class="form-field">{{ form.language.label_tag }}{{ form.language }}{{ form.language.errors }}</div><button class="button secondary" type="submit">{% translate "Save settings" %}</button></div>
+      </form>
+    </section>
+    {% if user.is_authenticated %}
+    <section class="settings-panel" id="api-keys" aria-labelledby="keys-heading">
+      <div class="section-heading"><div class="section-title"><h2 id="keys-heading">{% translate "API keys" %}</h2><span class="scope-badge">{% translate "Read only" %}</span></div><p class="muted">{% translate "Search and read your snippets from a terminal, editor, or integration." %}</p></div>
+      {% if new_api_key %}
+      <div class="key-reveal" role="status" tabindex="-1" id="new-key">
+        <h3>{% translate "Copy your new API key" %}</h3><p>{% translate "This is the only time the full key is shown. Store it somewhere safe." %}</p>
+        <div class="key-copy-row"><code>{{ new_api_key }}</code><button type="button" class="button secondary" data-copy="new-api-key" data-success="{% translate 'API key copied' %}">{% translate "Copy key" %}</button></div>{{ new_api_key|json_script:'new-api-key' }}
+      </div>{% endif %}
+      <form method="post" action="{% url 'api-key-create' %}" class="key-create-form">{% csrf_token %}{{ key_form.non_field_errors }}<div class="key-create-fields">{% for field in key_form %}<div class="form-field">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>{% endfor %}<button class="button primary" type="submit">＋ {% translate "Create key" %}</button></div></form>
+      <div class="key-list">{% for key in api_keys %}<article class="key-row"><div class="key-info"><h3>{{ key.name }} <span class="key-status {% if key.is_active %}active-key{% endif %}">{% if key.revoked_at %}{% translate "Revoked" %}{% elif key.is_active %}{% translate "Active" %}{% else %}{% translate "Expired" %}{% endif %}</span></h3><code>{{ key.prefix }}••••••••</code><p class="muted small">{% translate "Expires" %} {{ key.expires_at|date:'DATE_FORMAT' }} · {% translate "Last used" %}: {% if key.last_used_at %}{{ key.last_used_at|date:'DATETIME_FORMAT' }}{% else %}{% translate "Never" %}{% endif %}</p></div>{% if key.is_active %}<form method="post" action="{% url 'api-key-revoke' key.pk %}">{% csrf_token %}<button class="button secondary revoke-button" type="submit" aria-label="{% translate 'Revoke' %} {{ key.name }}">{% translate "Revoke" %}</button></form>{% endif %}</article>{% empty %}<div class="keys-empty"><span aria-hidden="true">⌘</span><h3>{% translate "No API keys yet" %}</h3><p class="muted">{% translate "Create a named key for each tool you connect." %}</p></div>{% endfor %}</div>
+      <p class="muted small panel-footnote">{% translate "Up to 10 active keys. Each key allows 60 requests per minute. Revoking a key immediately prevents new requests." %}</p>
+    </section>
+    <section class="settings-panel" id="backups" aria-labelledby="backups-heading">
+      <div class="section-heading"><h2 id="backups-heading">{% translate "Export & import" %}</h2><p class="muted">{% translate "Back up your snippets, tags, favorites, and dates in a password-encrypted file." %}</p></div>
+      <p class="muted small">{% translate "Use a separate password of at least 12 characters. Keep it safe: forgotten archive passwords cannot be recovered. Account passwords and API keys are never exported." %}</p>
+      <div class="backup-grid">
+        <form method="post" action="{% url 'export-data' %}" class="backup-form">{% csrf_token %}<h3>{% translate "Export encrypted backup" %}</h3>{{ export_form.non_field_errors }}{% for field in export_form %}<div class="form-field">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>{% endfor %}<button class="button secondary" type="submit">{% translate "Download backup" %}</button></form>
+        <form method="post" action="{% url 'import-data' %}" enctype="multipart/form-data" class="backup-form">{% csrf_token %}<h3>{% translate "Import encrypted backup" %}</h3>{{ import_form.non_field_errors }}{% for field in import_form %}<div class="form-field">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>{% endfor %}<p class="muted small">{% translate "Adds snippets to this account without replacing existing entries. Exact duplicates are skipped. Maximum: 2,000 snippets and 10 MiB per file." %}</p><button class="button primary" type="submit">{% translate "Import backup" %}</button></form>
+      </div>
+      <p class="muted small panel-footnote">{% translate "Encryption and decryption happen on your server. Use HTTPS when connecting remotely." %}</p>
+    </section>
+    <section class="settings-panel" id="api-example" aria-labelledby="api-heading"><div class="section-heading"><h2 id="api-heading">{% translate "API quick start" %}</h2><p class="muted">{% translate "Send the key in the Authorization header. Replace the URL with your server address." %}</p></div>
+      <pre class="api-example"><code>curl --get 'https://your-server.example/api/v1/snippets/' \
+  --header "Authorization: Bearer $SNIPPET_STACK_API_KEY" \
+  --data-urlencode 'q=free port 8080' \
+  --data-urlencode 'language=shell'</code></pre>
+      <dl class="api-endpoints"><dt>GET /api/v1/snippets/</dt><dd>{% translate "Search or list your snippets. Supports q, language, tag, favorite, sort, page, and page_size." %}</dd><dt>GET /api/v1/snippets/{id}/</dt><dd>{% translate "Read a single snippet, including its full code." %}</dd></dl>
+    </section>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

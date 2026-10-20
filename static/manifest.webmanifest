@@ -1,1 +1,26 @@
-{"id":"/","name":"Snippet Stack","short_name":"Snippet Stack","description":"Ваш личный набор кода и команд","lang":"ru","start_url":"/","scope":"/","display":"standalone","background_color":"#101216","theme_color":"#101216","icons":[{"src":"/static/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},{"src":"/static/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}
+{
+  "id": "/",
+  "name": "Snippet Stack",
+  "short_name": "Snippet Stack",
+  "description": "Your personal collection of code and commands",
+  "lang": "en",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#101216",
+  "theme_color": "#101216",
+  "icons": [
+    {
+      "src": "/static/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

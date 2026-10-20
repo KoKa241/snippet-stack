@@ -1,4 +1,6 @@
 import os
+import json
+from pathlib import Path
 from unittest import skipUnless
 from unittest.mock import patch
 import numpy as np
@@ -103,11 +105,11 @@ class SearchTests(TestCase):
         self.embed(self.python, 1)
         self.embed(self.secret)
         with override_settings(SEARCH_CANDIDATES=1):
-            result = self.search('освободить занятый порт')
+            result = self.search('free an occupied port')
         self.assertEqual(result.ids, [self.command.pk])
         self.assertEqual(result.semantic_status, 'ready')
-        self.assertEqual(self.search('освободить порт', Snippet.objects.filter(language='python')).ids, [])
-        self.assertEqual(self.search('освободить порт', Snippet.objects.filter(favorite=True)).ids, [])
+        self.assertEqual(self.search('free a port', Snippet.objects.filter(language='python')).ids, [])
+        self.assertEqual(self.search('free a port', Snippet.objects.filter(favorite=True)).ids, [])
 
     @override_settings(SEARCH_SEMANTIC_ENABLED=True)
     @patch('snippets.search.encode_query', side_effect=RuntimeError('offline'))
@@ -141,7 +143,7 @@ class SearchTests(TestCase):
         response = self.client.get('/?q=lsof')
         self.assertContains(response, 'Free port')
         self.assertNotContains(response, 'Free port secret')
-        self.assertContains(response, 'По релевантности')
+        self.assertContains(response, 'Relevance')
         self.assertNotContains(self.client.get('/?q=lsof&language=python'), 'Free port')
 
 
@@ -160,14 +162,15 @@ class RealSemanticSearchTests(TestCase):
         Snippet.objects.create(owner=user, title='Read JSON file',
             description='Load JSON configuration from disk', code='json.loads(data)', language='python')
         index_batch()
-        for query in ['убить процесс на порту 8080', 'освободить занятый порт']:
+        queries = json.loads((Path(__file__).parent / 'testdata/search_queries.ru.json').read_text())
+        for query in queries:
             result = search_snippets(Snippet.objects.all(), user_id=user.pk, text=query)
             self.assertEqual(result.ids[0], command.pk)
             self.assertEqual(result.semantic_status, 'ready')
         self.client.force_login(user)
-        response = self.client.get('/', {'q': 'освободить занятый порт'})
+        response = self.client.get('/', {'q': queries[1]})
         self.assertEqual(response.context['page'][0].pk, command.pk)
-        self.assertContains(response, 'Поиск по словам и смыслу')
+        self.assertContains(response, 'Keyword and semantic search')
 
 
 @override_settings(SEARCH_SEMANTIC_ENABLED=False)
@@ -175,7 +178,7 @@ class SearchMigrationTests(TransactionTestCase):
     def test_existing_snippets_and_tags_are_backfilled(self):
         executor = MigrationExecutor(connection)
         old_target = [('snippets', '0001_initial')]
-        new_target = [('snippets', '0003_search_fts')]
+        new_target = [('snippets', '0005_apikey')]
         executor.migrate(old_target)
         try:
             apps = executor.loader.project_state(old_target).apps

@@ -1,1 +1,19 @@
-{% extends 'base.html' %}{% block content %}<div class="auth-shell"><a class="brand" href="/"><span class="brand-icon">⌘</span>Snippet<span class="brand-light">Stack</span><span class="brand-dot">.</span></a><div class="auth-card"><p class="eyebrow accent">НАЧНИТЕ СВОЙ СТЕК</p><h1>Место для<br>полезного кода.</h1><p class="muted">Создайте аккаунт и сохраните первую находку.</p><form method="post">{% csrf_token %}{{ form.non_field_errors }}{% for field in form %}<div class="form-field">{{ field.label_tag }}{{ field }}{{ field.errors }}{% if field.help_text %}<div class="help-text">{{ field.help_text|safe }}</div>{% endif %}</div>{% endfor %}<button class="button primary full-width">Создать аккаунт →</button></form><p class="auth-switch">Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p></div><button type="button" class="theme-toggle">◐ Сменить тему</button></div>{% endblock %}
+{% extends 'base.html' %}{% load i18n %}
+{% block title %}{% translate "Create account" %} · Snippet Stack{% endblock %}
+{% block content %}
+<div class="auth-shell">
+  <a class="brand" href="/"><span class="brand-icon">⌘</span>Snippet<span class="brand-light">Stack</span><span class="brand-dot">.</span></a>
+  <div class="auth-card">
+    <p class="eyebrow accent">{% translate "START YOUR STACK" %}</p>
+    <h1>{% translate "A home for" %}<br>{% translate "useful code." %}</h1>
+    <p class="muted">{% translate "Create an account and save your first find." %}</p>
+    <form method="post">{% csrf_token %}{{ form.non_field_errors }}
+      {% for field in form %}<div class="form-field">{{ field.label_tag }}{{ field }}{{ field.errors }}{% if field.help_text %}<div class="help-text">{{ field.help_text|safe }}</div>{% endif %}</div>{% endfor %}
+      <button class="button primary full-width">{% translate "Create account" %} →</button>
+    </form>
+    <p class="auth-switch">{% translate "Already have an account?" %} <a href="{% url 'login' %}">{% translate "Log in" %}</a></p>
+  </div>
+  <p class="muted auth-caption">{% translate "Less searching. More coding." %}</p>
+  <div class="auth-preferences"><a class="settings-link" href="{% url 'settings' %}">⚙ {% translate "Settings" %}</a></div>
+</div>
+{% endblock %}

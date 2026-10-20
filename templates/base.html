@@ -1,12 +1,53 @@
-{% load static %}<!doctype html>
-<html lang="ru" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#101217"><meta name="description" content="Snippet Stack — ваш личный набор кода и команд."><title>{% block title %}Snippet Stack{% endblock %}</title><link rel="icon" href="{% static 'icons/icon.svg' %}" type="image/svg+xml"><link rel="apple-touch-icon" href="{% static 'icons/icon-192.png' %}"><link rel="manifest" href="{% static 'manifest.webmanifest' %}"><link rel="stylesheet" href="{% static 'app.css' %}"><script src="{% static 'theme.js' %}"></script><script src="{% static 'app.js' %}" defer></script></head>
+{% load static i18n %}{% get_current_language as LANGUAGE_CODE %}<!doctype html>
+<html lang="{{ LANGUAGE_CODE }}" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101217">
+  <meta name="description" content="{% translate "Snippet Stack — your personal collection of code and commands." %}">
+  <title>{% block title %}Snippet Stack{% endblock %}</title>
+  <link rel="icon" href="{% static 'icons/icon.svg' %}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{% static 'icons/icon-192.png' %}">
+  <link rel="manifest" href="{% if LANGUAGE_CODE == 'ru' %}{% static 'manifest.ru.webmanifest' %}{% else %}{% static 'manifest.webmanifest' %}{% endif %}">
+  <link rel="stylesheet" href="{% static 'app.css' %}">
+  <script src="{% static 'theme.js' %}"></script>
+  <script src="{% static 'app.js' %}" defer></script>
+</head>
 <body>
+<a class="skip-link" href="#main-content">{% translate "Skip to content" %}</a>
 {% if user.is_authenticated %}
-<aside class="sidebar"><a class="brand" href="/" aria-label="Snippet Stack — главная"><span class="brand-icon">⌘</span>Snippet<span class="brand-light">Stack</span><span class="brand-dot">.</span></a><div class="workspace"><span class="avatar">{{ user.username|first|upper }}</span><div>{{ user.username }}<small>Личное пространство</small></div><span class="workspace-lock">♧</span></div><p class="eyebrow nav-label">БИБЛИОТЕКА</p><nav><a class="nav-link {% if not mode %}active{% endif %}" href="/"><span>▦</span> Все сниппеты <b>{{ total|default:'0' }}</b></a><a class="nav-link {% if mode == 'favorites' %}active{% endif %}" href="/?view=favorites"><span>☆</span> Избранное <b>{{ favorites|default:'0' }}</b></a><a class="nav-link {% if mode == 'terminal' %}active{% endif %}" href="/?view=terminal"><span>›_</span> Команды <b>{{ terminals|default:'0' }}</b></a></nav><p class="eyebrow nav-label">ТЕГИ <span>#</span></p><div class="tag-nav">{% for item in tags %}<a class="{% if tag == item.name %}selected{% endif %}" href="/?tag={{ item.name|urlencode }}"><span>#</span>{{ item.name }}<small>{{ item.total }}</small></a>{% empty %}<p class="muted small">Добавьте теги при создании сниппета.</p>{% endfor %}</div><div class="sidebar-bottom"><div class="local-note"><span class="status-dot"></span>Ваш код. В одном месте.</div><div class="bottom-actions"><button class="theme-toggle" type="button" aria-label="Переключить тему">◐ <span>Сменить тему</span></button><form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="logout" aria-label="Выйти" title="Выйти">↪</button></form></div></div></aside>
+<aside class="sidebar">
+  <a class="brand" href="/" aria-label="{% translate "Snippet Stack home" %}"><span class="brand-icon">⌘</span>Snippet<span class="brand-light">Stack</span><span class="brand-dot">.</span></a>
+  <div class="workspace"><span class="avatar">{{ user.username|first|upper }}</span><div>{{ user.username }}<small>{% translate "Personal workspace" %}</small></div><span class="workspace-lock">♧</span></div>
+  <p class="eyebrow nav-label">{% translate "LIBRARY" %}</p>
+  <nav>
+    <a class="nav-link {% if request.resolver_match.url_name == 'home' and not mode %}active{% endif %}" href="/"><span>▦</span> {% translate "All snippets" %} <b>{{ total|default:'0' }}</b></a>
+    <a class="nav-link {% if mode == 'favorites' %}active{% endif %}" href="/?view=favorites"><span>☆</span> {% translate "Favorites" %} <b>{{ favorites|default:'0' }}</b></a>
+    <a class="nav-link {% if mode == 'terminal' %}active{% endif %}" href="/?view=terminal"><span>›_</span> {% translate "Commands" %} <b>{{ terminals|default:'0' }}</b></a>
+  </nav>
+  <p class="eyebrow nav-label">{% translate "TAGS" %} <span>#</span></p>
+  <div class="tag-nav">{% for item in tags %}<a class="{% if tag == item.name %}selected{% endif %}" href="/?tag={{ item.name|urlencode }}"><span>#</span>{{ item.name }}<small>{{ item.total }}</small></a>{% empty %}<p class="muted small">{% translate "Add tags when creating a snippet." %}</p>{% endfor %}</div>
+  <div class="sidebar-bottom">
+    <div class="local-note"><span class="status-dot"></span>{% translate "Your code. In one place." %}</div>
+    <div class="bottom-actions">
+      <a class="settings-link {% if request.resolver_match.url_name == 'settings' %}selected{% endif %}" href="{% url 'settings' %}" aria-label="{% translate "Settings" %}" title="{% translate "Settings" %}">⚙ <span>{% translate "Settings" %}</span></a>
+
+      <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="logout" aria-label="{% translate "Log out" %}" title="{% translate "Log out" %}">↪</button></form>
+    </div>
+  </div>
+</aside>
 {% endif %}
-<main class="{% if user.is_authenticated %}main{% else %}auth-main{% endif %}">
-{% if messages %}<div class="notifications" role="status">{% for message in messages %}<div class="notice">{{ message }}</div>{% endfor %}</div>{% endif %}
-{% block content %}{% endblock %}
-</main><div class="toast" role="status" hidden></div>
-<dialog id="delete-dialog"><form method="post" id="delete-form">{% csrf_token %}<div class="dialog-icon">⌫</div><h2>Удалить сниппет?</h2><p class="muted">Восстановить его после удаления не получится.</p><div class="dialog-actions"><button type="button" class="button secondary" id="cancel-delete">Отмена</button><button class="button danger">Удалить</button></div></form></dialog>
-</body></html>
+<main id="main-content" class="{% if user.is_authenticated %}main{% else %}auth-main{% endif %}">
+  {% if messages %}<div class="notifications" role="status">{% for message in messages %}<div class="notice">{{ message }}</div>{% endfor %}</div>{% endif %}
+  {% block content %}{% endblock %}
+</main>
+<div class="toast" role="status" hidden data-copy-success="{% translate "Code copied" %}" data-copy-error="{% translate "Could not copy. Open the editor and copy the code manually." %}"></div>
+<dialog id="delete-dialog">
+  <form method="post" id="delete-form">{% csrf_token %}
+    <div class="dialog-icon">⌫</div><h2>{% translate "Delete snippet?" %}</h2>
+    <p class="muted">{% translate "This action cannot be undone." %}</p>
+    <div class="dialog-actions"><button type="button" class="button secondary" id="cancel-delete">{% translate "Cancel" %}</button><button class="button danger">{% translate "Delete" %}</button></div>
+  </form>
+</dialog>
+</body>
+</html>
