@@ -25,3 +25,15 @@ class Snippet(models.Model):
     class Meta:
         ordering = ['-updated_at', '-pk']
         indexes = [models.Index(fields=['owner', '-updated_at']), models.Index(fields=['owner', 'language'])]
+
+
+class SearchDocument(models.Model):
+    """Derived search data; safe to rebuild from Snippet and its tags."""
+    snippet = models.OneToOneField(Snippet, on_delete=models.CASCADE, primary_key=True)
+    title = models.TextField()
+    description = models.TextField()
+    code = models.TextField()
+    tags = models.TextField()
+    content_hash = models.CharField(max_length=64)
+    embedding = models.BinaryField(null=True, editable=False)
+    embedding_model = models.CharField(max_length=200, blank=True)

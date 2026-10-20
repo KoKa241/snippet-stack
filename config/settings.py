@@ -47,3 +47,11 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 262144
 if os.getenv('TRUST_PROXY', 'false').lower() == 'true':
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_REDIRECT_EXEMPT = [r'^health/$']
+
+# Local CPU semantic search. Model downloads are only performed by index_search.
+SEARCH_MODEL = 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'
+SEARCH_MODEL_CACHE = os.getenv('SEARCH_MODEL_CACHE', str(DATA_DIR / 'models'))
+SEARCH_SEMANTIC_ENABLED = os.getenv('SEARCH_SEMANTIC_ENABLED', 'true').lower() == 'true'
+SEARCH_THREADS = int(os.getenv('SEARCH_THREADS', '2'))
+SEARCH_CANDIDATES = 100
+SEARCH_MIN_SIMILARITY = float(os.getenv('SEARCH_MIN_SIMILARITY', '0.25'))

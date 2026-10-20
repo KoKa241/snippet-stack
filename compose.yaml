@@ -12,6 +12,8 @@ services:
       CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-}
       HTTPS: ${HTTPS:-false}
       TRUST_PROXY: ${TRUST_PROXY:-false}
+      SEARCH_SEMANTIC_ENABLED: ${SEARCH_SEMANTIC_ENABLED:-true}
+      SEARCH_THREADS: ${SEARCH_THREADS:-2}
     volumes:
       - snippet_data:/app/data
     security_opt:
@@ -24,5 +26,23 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+  search-indexer:
+    build: .
+    restart: unless-stopped
+    init: true
+    command: ["python", "manage.py", "index_search", "--watch"]
+    depends_on:
+      web:
+        condition: service_healthy
+    environment:
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in .env}
+      SEARCH_SEMANTIC_ENABLED: ${SEARCH_SEMANTIC_ENABLED:-true}
+      SEARCH_THREADS: ${SEARCH_THREADS:-2}
+    volumes:
+      - snippet_data:/app/data
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
 volumes:
   snippet_data:

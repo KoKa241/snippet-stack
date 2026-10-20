@@ -3,13 +3,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.core.paginator import Paginator
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Case, When, IntegerField
 from django.http import FileResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from django.conf import settings
 from .forms import SnippetForm
 from .models import Snippet, LANGUAGES
+from .search import search_snippets
 
 def register(request):
     if request.user.is_authenticated:
@@ -29,8 +30,6 @@ def home(request):
     language = request.GET.get('language', '')
     tag = request.GET.get('tag', '')
     mode = request.GET.get('view', '')
-    if q:
-        snippets = snippets.filter(Q(title__icontains=q) | Q(description__icontains=q) | Q(code__icontains=q) | Q(tags__name__icontains=q)).distinct()
     if language:
         snippets = snippets.filter(language=language)
     if tag:
@@ -39,12 +38,27 @@ def home(request):
         snippets = snippets.filter(favorite=True)
     if mode == 'terminal':
         snippets = snippets.filter(language='shell')
-    sort = request.GET.get('sort', 'updated')
-    snippets = snippets.order_by('title', 'pk') if sort == 'title' else snippets.order_by('-updated_at', '-pk')
+    sort = request.GET.get('sort', 'relevance')
+    if sort not in {'relevance', 'updated', 'title'}:
+        sort = 'relevance'
+    search_status = ''
+    if q:
+        result = search_snippets(snippets, user_id=request.user.pk, text=q)
+        search_status = result.semantic_status
+        snippets = snippets.filter(pk__in=result.ids)
+        if result.ids and sort == 'relevance':
+            snippets = snippets.order_by(Case(
+                *[When(pk=pk, then=rank) for rank, pk in enumerate(result.ids)],
+                output_field=IntegerField(),
+            ))
+    if sort == 'title':
+        snippets = snippets.order_by('title', 'pk')
+    elif sort == 'updated' or not q:
+        snippets = snippets.order_by('-updated_at', '-pk')
     page = Paginator(snippets, 12).get_page(request.GET.get('page'))
     params = request.GET.copy()
     params.pop('page', None)
-    return render(request, 'home.html', {'page': page, 'q': q, 'language': language, 'tag': tag, 'mode': mode, 'sort': sort, 'languages': LANGUAGES, 'query': params.urlencode()})
+    return render(request, 'home.html', {'page': page, 'q': q, 'language': language, 'tag': tag, 'mode': mode, 'sort': sort, 'languages': LANGUAGES, 'query': params.urlencode(), 'search_status': search_status})
 
 @login_required
 def edit(request, pk=None):
