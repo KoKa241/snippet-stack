@@ -1,11 +1,13 @@
 """Shared library filtering and ranking for HTML and API clients."""
 from django.db.models import Case, When, IntegerField
-from .models import Snippet
+from .models import Snippet, COMMAND_LANGUAGES
 from .search import search_snippets
 
 
-def select_snippets(user_id, *, q='', language='', tag='', favorite=None, sort='relevance'):
+def select_snippets(user_id, *, q='', language='', tag='', favorite=None, sort='relevance', commands_only=False):
     snippets = Snippet.objects.filter(owner_id=user_id).prefetch_related('tags')
+    if commands_only:
+        snippets = snippets.filter(language__in=COMMAND_LANGUAGES)
     if language:
         snippets = snippets.filter(language=language)
     if tag:

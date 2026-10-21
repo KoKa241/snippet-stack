@@ -7,7 +7,7 @@ document.querySelectorAll('.auto-submit').forEach(select => select.addEventListe
 const dialog = document.getElementById('delete-dialog');
 document.querySelectorAll('[data-delete]').forEach(button => button.addEventListener('click', () => { document.getElementById('delete-form').action = button.dataset.delete; dialog.showModal(); }));
 document.getElementById('cancel-delete').addEventListener('click', () => dialog.close());
-document.addEventListener('keydown', event => { const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName); if (event.key === '/' && !typing) { const search = document.getElementById('search'); if (search) { event.preventDefault(); search.focus(); } } if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') { document.querySelector('.editor-form')?.requestSubmit(); } });
+document.addEventListener('keydown', event => { const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName); if (event.key === '/' && !typing) { const search = document.getElementById('search'); if (search) { event.preventDefault(); search.focus(); } } if ((event.ctrlKey || event.metaKey) && event.key === 'Enter' && !document.querySelector('dialog[open]')) { document.querySelector('.editor-form')?.requestSubmit(); } });
 const editor = document.getElementById('id_code');
 if (editor) editor.addEventListener('keydown', event => { if (event.key === 'Tab' && !event.shiftKey) { event.preventDefault(); editor.setRangeText('    ', editor.selectionStart, editor.selectionEnd, 'end'); editor.dispatchEvent(new Event('input', {bubbles:true})); } });
 let dirty = false;

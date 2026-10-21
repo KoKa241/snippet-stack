@@ -76,6 +76,7 @@ def serialize(snippet):
         'id': snippet.pk, 'title': snippet.title, 'description': snippet.description,
         'code': snippet.code, 'language': snippet.language, 'favorite': snippet.favorite,
         'tags': [tag.name for tag in snippet.tags.all()],
+        'tag_colors': {tag.name: tag.color for tag in snippet.tags.all()},
         'created_at': snippet.created_at.isoformat(), 'updated_at': snippet.updated_at.isoformat(),
     }
 

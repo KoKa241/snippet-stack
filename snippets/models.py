@@ -1,10 +1,26 @@
 from django.conf import settings
 from django.db import models
+from django.core.validators import RegexValidator
+from .tag_colors import random_color
 from django.utils.translation import gettext_lazy as _
 
-LANGUAGES = [('python', 'Python'), ('shell', _('Terminal')), ('javascript', 'JavaScript'), ('typescript', 'TypeScript'), ('sql', 'SQL'), ('html', 'HTML'), ('css', 'CSS'), ('json', 'JSON'), ('yaml', 'YAML'), ('other', _('Plain text'))]
+LANGUAGES = [
+    ('python', 'Python'), ('shell', _('Terminal')), ('powershell', 'PowerShell'),
+    ('javascript', 'JavaScript'), ('typescript', 'TypeScript'),
+    ('jsx', 'JSX / React'), ('tsx', 'TSX / React'),
+    ('c', 'C'), ('cpp', 'C++'), ('csharp', 'C#'), ('java', 'Java'),
+    ('go', 'Go'), ('rust', 'Rust'), ('php', 'PHP'), ('ruby', 'Ruby'),
+    ('swift', 'Swift'), ('kotlin', 'Kotlin'), ('dart', 'Dart'), ('lua', 'Lua'), ('r', 'R'),
+    ('sql', 'SQL'), ('html', 'HTML'), ('css', 'CSS'), ('scss', 'SCSS'),
+    ('json', 'JSON'), ('yaml', 'YAML'), ('toml', 'TOML'), ('xml', 'XML'),
+    ('markdown', 'Markdown'), ('docker', 'Dockerfile'), ('nginx', 'Nginx'),
+    ('other', _('Plain text')),
+]
+
+COMMAND_LANGUAGES = ('shell', 'powershell')
 
 class Tag(models.Model):
+    color = models.CharField(max_length=7, default=random_color, validators=[RegexValidator(r"^#[0-9a-fA-F]{6}$")])
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=32)
     class Meta:

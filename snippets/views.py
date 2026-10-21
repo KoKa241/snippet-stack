@@ -11,15 +11,17 @@ from django.utils.translation import gettext as _
 from django.conf import settings
 from .forms import SnippetForm, PreferencesForm, APIKeyForm, ExportForm, ImportForm
 from django.views.decorators.debug import sensitive_post_parameters, sensitive_variables
-from .models import Snippet, LANGUAGES, UserPreference, APIKey
+from .models import Snippet, LANGUAGES, COMMAND_LANGUAGES, UserPreference, APIKey, Tag
 from .selectors import select_snippets
 from .api import issue_key
 from django.utils import timezone
 
+@sensitive_post_parameters('password1', 'password2')
+@require_http_methods(['GET', 'POST'])
 def register(request):
     if request.user.is_authenticated:
         return redirect('home')
-    form = UserCreationForm(request.POST or None)
+    form = UserCreationForm(request.POST if request.method == 'POST' else None)
     if request.method == 'POST' and form.is_valid():
         form.save()
         messages.success(request, _('Account created. Log in to your stack.'))
@@ -32,30 +34,29 @@ def home(request):
     language = request.GET.get('language', '')
     tag = request.GET.get('tag', '')
     mode = request.GET.get('view', '')
-    if mode == 'terminal':
-        language = 'shell'
     sort = request.GET.get('sort', 'relevance')
     if sort not in {'relevance', 'updated', 'title'}:
         sort = 'relevance'
     snippets, search_status = select_snippets(
-        request.user.pk, q=q, language='shell' if mode == 'terminal' else language,
+        request.user.pk, q=q, language=language, commands_only=mode == 'terminal',
         tag=tag, favorite=True if mode == 'favorites' else None, sort=sort,
     )
     page = Paginator(snippets, 12).get_page(request.GET.get('page'))
     params = request.GET.copy()
     params.pop('page', None)
-    return render(request, 'home.html', {'page': page, 'q': q, 'language': language, 'tag': tag, 'mode': mode, 'sort': sort, 'languages': [('shell', _('Terminal'))] if mode == 'terminal' else LANGUAGES, 'query': params.urlencode(), 'search_status': search_status})
+    return render(request, 'home.html', {'page': page, 'q': q, 'language': language, 'tag': tag, 'mode': mode, 'sort': sort, 'languages': [(value, label) for value, label in LANGUAGES if value in COMMAND_LANGUAGES] if mode == 'terminal' else LANGUAGES, 'query': params.urlencode(), 'search_status': search_status})
 
 @login_required
+@require_http_methods(['GET', 'POST'])
 def edit(request, pk=None):
     snippet = get_object_or_404(Snippet, pk=pk, owner=request.user) if pk else None
-    form = SnippetForm(request.POST or None, instance=snippet, initial={'tag_names': ', '.join(snippet.tags.values_list('name', flat=True)) if snippet else ''})
+    form = SnippetForm(request.POST if request.method == 'POST' else None, instance=snippet, initial={'tag_names': ', '.join(snippet.tags.values_list('name', flat=True)) if snippet else ''})
     if request.method == 'POST' and form.is_valid():
         with transaction.atomic():
             form.save_for(request.user)
         messages.success(request, _('Snippet saved.'))
         return redirect('home')
-    return render(request, 'edit.html', {'form': form, 'snippet': snippet})
+    return render(request, 'edit.html', {'form': form, 'snippet': snippet, 'available_tags': list(Tag.objects.filter(owner=request.user).values('id', 'name', 'color'))})
 
 @login_required
 @require_POST

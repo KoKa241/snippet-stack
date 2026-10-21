@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-20 22:08+0000\n"
+"POT-Creation-Date: 2026-10-20 22:30+0000\n"
 "Language: ru\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -19,15 +19,15 @@ msgstr "Русский"
 msgid "Interface language"
 msgstr "Язык интерфейса"
 
-#: snippets/forms.py:13 snippets/forms.py:30 templates/edit.html:9
+#: snippets/forms.py:13 snippets/forms.py:30 templates/edit.html:25
 msgid "Code"
 msgstr "Код"
 
 #: snippets/forms.py:16
-msgid "# Your next useful snippet"
-msgstr "# Ваш следующий полезный сниппет"
+msgid "# Enter code..."
+msgstr "# Введите код..."
 
-#: snippets/forms.py:20
+#: snippets/forms.py:20 templates/edit.html:13 templates/edit.html:18
 msgid "Tags"
 msgstr "Теги"
 
@@ -126,13 +126,21 @@ msgstr "Нет подключения · Snippet Stack"
 msgid "Your personal collection of code and commands"
 msgstr "Ваш личный набор кода и команд"
 
-#: snippets/models.py:5 snippets/views.py:47
+#: snippets/models.py:7 snippets/views.py:47
 msgid "Terminal"
 msgstr "Терминал"
 
-#: snippets/models.py:5
+#: snippets/models.py:7
 msgid "Plain text"
 msgstr "Обычный текст"
+
+#: snippets/tag_views.py:16
+msgid "Use a tag name of 1–32 characters without commas."
+msgstr "Введите название тега длиной от 1 до 32 символов без запятых."
+
+#: snippets/tag_views.py:27 templates/edit.html:40
+msgid "Enter a color in #RRGGBB format."
+msgstr "Введите цвет в формате #RRGGBB."
 
 #: snippets/test_preferences.py:39 templates/registration/login.html:2
 #: templates/registration/login.html:12 templates/registration/register.html:14
@@ -143,7 +151,7 @@ msgstr "Войти"
 msgid "Username"
 msgstr ""
 
-#: snippets/test_preferences.py:54 templates/base.html:24 templates/home.html:6
+#: snippets/test_preferences.py:54 templates/base.html:26 templates/home.html:6
 msgid "All snippets"
 msgstr "Все сниппеты"
 
@@ -182,84 +190,83 @@ msgstr "Экспорт поддерживает до 2000 сниппетов и 
 msgid ""
 "Cannot import this archive. Check the password and use a valid Snippet Stack "
 "backup. No data was changed."
-msgstr "Не удалось импортировать архив. Проверьте пароль и выберите корректную резервную копию Snippet Stack. Данные не изменены."
+msgstr ""
+"Не удалось импортировать архив. Проверьте пароль и выберите корректную "
+"резервную копию Snippet Stack. Данные не изменены."
 
 #: snippets/views.py:182
 #, python-format
 msgid "Import complete: %(created)s added, %(skipped)s duplicates skipped."
-msgstr "Импорт завершён: добавлено %(created)s, пропущено дубликатов %(skipped)s."
+msgstr ""
+"Импорт завершён: добавлено %(created)s, пропущено дубликатов %(skipped)s."
 
 #: templates/base.html:7
 msgid "Snippet Stack — your personal collection of code and commands."
 msgstr "Snippet Stack — ваш личный набор кода и команд."
 
-#: templates/base.html:17
+#: templates/base.html:19
 msgid "Skip to content"
 msgstr "Перейти к содержимому"
 
-#: templates/base.html:20
+#: templates/base.html:22
 msgid "Snippet Stack home"
 msgstr "Snippet Stack — главная"
 
-#: templates/base.html:21
+#: templates/base.html:23
 msgid "Personal workspace"
 msgstr "Личное пространство"
 
-#: templates/base.html:22
+#: templates/base.html:24
 msgid "LIBRARY"
 msgstr "БИБЛИОТЕКА"
 
-#: templates/base.html:25 templates/home.html:6
+#: templates/base.html:27 templates/home.html:6
 msgid "Favorites"
 msgstr "Избранное"
 
-#: templates/base.html:26
+#: templates/base.html:28
 msgid "Commands"
 msgstr "Команды"
 
-#: templates/base.html:28
+#: templates/base.html:30
 msgid "TAGS"
 msgstr "ТЕГИ"
 
-#: templates/base.html:29
+#: templates/base.html:31
 msgid "Add tags when creating a snippet."
 msgstr "Добавьте теги при создании сниппета."
 
-#: templates/base.html:31
-msgid "Your code. In one place."
-msgstr "Ваш код. В одном месте."
-
-#: templates/base.html:33 templates/registration/login.html:17
+#: templates/base.html:34 templates/registration/login.html:17
 #: templates/registration/register.html:17 templates/settings.html:2
 #: templates/settings.html:5 templates/settings.html:7
 msgid "Settings"
 msgstr "Настройки"
 
-#: templates/base.html:35
+#: templates/base.html:36
 msgid "Log out"
 msgstr "Выйти"
 
-#: templates/base.html:44
+#: templates/base.html:45
 msgid "Code copied"
 msgstr "Код скопирован"
 
-#: templates/base.html:44
+#: templates/base.html:45
 msgid "Could not copy. Open the editor and copy the code manually."
 msgstr "Не удалось скопировать. Откройте редактор и скопируйте код вручную."
 
-#: templates/base.html:47
+#: templates/base.html:48
 msgid "Delete snippet?"
 msgstr "Удалить сниппет?"
 
-#: templates/base.html:48
+#: templates/base.html:49
 msgid "This action cannot be undone."
 msgstr "Восстановить его после удаления не получится."
 
-#: templates/base.html:49 templates/edit.html:10
+#: templates/base.html:50 templates/edit.html:29 templates/edit.html:41
 msgid "Cancel"
 msgstr "Отмена"
 
-#: templates/base.html:49 templates/home.html:31
+#: templates/base.html:50 templates/home.html:31
 msgid "Delete"
 msgstr "Удалить"
 
@@ -287,37 +294,73 @@ msgstr ""
 "Системная тема автоматически следует настройкам устройства. Выбор "
 "сохраняется в этом браузере."
 
-#: templates/edit.html:2 templates/edit.html:6
+#: templates/edit.html:2 templates/edit.html:7
 msgid "Edit snippet"
 msgstr "Редактировать сниппет"
 
-#: templates/edit.html:2 templates/edit.html:6 templates/home.html:8
+#: templates/edit.html:2 templates/edit.html:7 templates/home.html:8
 msgid "New snippet"
 msgstr "Новый сниппет"
 
-#: templates/edit.html:4 templates/home.html:3
+#: templates/edit.html:5 templates/home.html:3
 msgid "Library"
 msgstr "Библиотека"
 
-#: templates/edit.html:4
-msgid "Your next useful snippet"
-msgstr "Ваш следующий полезный фрагмент"
+#: templates/edit.html:12
+msgid "Add tag"
+msgstr "Добавить тег"
 
-#: templates/edit.html:6
-msgid "SAVE IT FOR LATER"
-msgstr "СОХРАНИТЕ НА ПОТОМ"
+#: templates/edit.html:12
+msgid "Remove tag"
+msgstr "Удалить тег"
 
-#: templates/edit.html:6
-msgid "Code, a command, or an idea — everything in its place."
-msgstr "Код, команда или идея — всё на своём месте."
+#: templates/edit.html:12
+msgid "Edit tag color"
+msgstr "Изменить цвет тега"
 
-#: templates/edit.html:9
+#: templates/edit.html:12
+msgid "No matching tags"
+msgstr "Подходящих тегов нет"
+
+#: templates/edit.html:12
+msgid "Select up to 10 tags."
+msgstr "Выберите до 10 тегов."
+
+#: templates/edit.html:12
+msgid "Could not save the tag. Please try again."
+msgstr "Не удалось сохранить тег. Попробуйте ещё раз."
+
+#: templates/edit.html:17
+msgid "Find or create a tag"
+msgstr "Найти или создать тег"
+
+#: templates/edit.html:21
+msgid "Up to 10 tags. Click a selected tag to edit its color."
+msgstr "До 10 тегов. Нажмите на выбранный тег, чтобы изменить его цвет."
+
+#: templates/edit.html:28
 msgid "Tab to indent · Ctrl/⌘ + Enter to save"
 msgstr "Tab — отступ · Ctrl/⌘ + Enter — сохранить"
 
-#: templates/edit.html:10
-msgid "Save snippet"
-msgstr "Сохранить сниппет"
+#: templates/edit.html:29 templates/edit.html:41
+msgid "Save"
+msgstr "Сохранить"
+
+#: templates/edit.html:35
+msgid "Tag color"
+msgstr "Цвет тега"
+
+#: templates/edit.html:36
+msgid "Applies to this tag across your snippets."
+msgstr "Цвет изменится у этого тега во всех ваших сниппетах."
+
+#: templates/edit.html:38
+msgid "Suggested colors"
+msgstr "Предлагаемые цвета"
+
+#: templates/edit.html:39
+msgid "Color"
+msgstr "Цвет"
 
 #: templates/home.html:3
 msgid "Workspace"
@@ -680,14 +723,18 @@ msgstr ""
 msgid ""
 "Back up your snippets, tags, favorites, and dates in a password-encrypted "
 "file."
-msgstr "Сохраните сниппеты, теги, избранное и даты в файл, зашифрованный паролем."
+msgstr ""
+"Сохраните сниппеты, теги, избранное и даты в файл, зашифрованный паролем."
 
 #: templates/settings.html:31
 msgid ""
 "Use a separate password of at least 12 characters. Keep it safe: forgotten "
 "archive passwords cannot be recovered. Account passwords and API keys are "
 "never exported."
-msgstr "Используйте отдельный пароль длиной от 12 символов. Храните его в надёжном месте: забытый пароль архива восстановить нельзя. Пароли аккаунтов и API-ключи не экспортируются."
+msgstr ""
+"Используйте отдельный пароль длиной от 12 символов. Храните его в надёжном "
+"месте: забытый пароль архива восстановить нельзя. Пароли аккаунтов и API-"
+"ключи не экспортируются."
 
 #: templates/settings.html:33
 msgid "Export encrypted backup"
@@ -705,7 +752,9 @@ msgstr "Импорт зашифрованной копии"
 msgid ""
 "Adds snippets to this account without replacing existing entries. Exact "
 "duplicates are skipped. Maximum: 2,000 snippets and 10 MiB per file."
-msgstr "Добавляет сниппеты в этот аккаунт, не заменяя существующие записи. Точные дубликаты пропускаются. Максимум: 2000 сниппетов и 10 МиБ на файл."
+msgstr ""
+"Добавляет сниппеты в этот аккаунт, не заменяя существующие записи. Точные "
+"дубликаты пропускаются. Максимум: 2000 сниппетов и 10 МиБ на файл."
 
 #: templates/settings.html:34
 msgid "Import backup"
@@ -715,7 +764,9 @@ msgstr "Импортировать копию"
 msgid ""
 "Encryption and decryption happen on your server. Use HTTPS when connecting "
 "remotely."
-msgstr "Шифрование и расшифровка выполняются на вашем сервере. Для удалённого подключения используйте HTTPS."
+msgstr ""
+"Шифрование и расшифровка выполняются на вашем сервере. Для удалённого "
+"подключения используйте HTTPS."
 
 #: templates/settings.html:38
 msgid ""
@@ -736,6 +787,24 @@ msgstr ""
 #: templates/settings.html:43
 msgid "Read a single snippet, including its full code."
 msgstr "Получение одного сниппета с полным кодом."
+
+#~ msgid "# Your next useful snippet"
+#~ msgstr "# Ваш следующий полезный сниппет"
+
+#~ msgid "Your code. In one place."
+#~ msgstr "Ваш код. В одном месте."
+
+#~ msgid "Your next useful snippet"
+#~ msgstr "Ваш следующий полезный фрагмент"
+
+#~ msgid "SAVE IT FOR LATER"
+#~ msgstr "СОХРАНИТЕ НА ПОТОМ"
+
+#~ msgid "Code, a command, or an idea — everything in its place."
+#~ msgstr "Код, команда или идея — всё на своём месте."
+
+#~ msgid "Save snippet"
+#~ msgstr "Сохранить сниппет"
 
 #~ msgid "Toggle theme"
 #~ msgstr "Переключить тему"

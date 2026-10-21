@@ -12,6 +12,7 @@ from django.utils.dateparse import parse_datetime
 from django.views.decorators.debug import sensitive_variables
 
 from .models import LANGUAGES, Snippet, Tag
+from .tag_colors import valid_color
 
 MAGIC = b'SNIPPETSTACK\x01'
 MAX_BYTES = 10 * 1024 * 1024
@@ -62,35 +63,39 @@ def export_archive(user, password):
     # Incremental size accounting bounds memory even for large libraries.
     parts, size = [], 0
     for snippet in Snippet.objects.filter(owner=user).prefetch_related('tags').iterator(chunk_size=100):
-        part = json.dumps(record(snippet), ensure_ascii=False, separators=(',', ':')).encode('utf-8')
+        part = json.dumps(record(snippet) | {'tag_colors': {tag.name: tag.color for tag in snippet.tags.all()}}, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
         size += len(part) + 1
         if size > MAX_BYTES - 100 or len(parts) >= MAX_SNIPPETS:
             raise BackupError('size')
         parts.append(part)
-    return encrypt(b'{"version":1,"snippets":[' + b','.join(parts) + b']}', password)
+    return encrypt(b'{"version":2,"snippets":[' + b','.join(parts) + b']}', password)
 
 
 def validate_payload(payload):
     try:
         data = json.loads(payload)
-        if not isinstance(data, dict) or set(data) != {'version', 'snippets'} or type(data['version']) is not int or data['version'] != 1:
+        if not isinstance(data, dict) or set(data) != {'version', 'snippets'} or type(data['version']) is not int or data['version'] not in (1, 2):
             raise ValueError()
         rows = data['snippets']
         if not isinstance(rows, list) or len(rows) > MAX_SNIPPETS:
             raise ValueError()
         for row in rows:
-            if not isinstance(row, dict) or set(row) != FIELDS:
+            if not isinstance(row, dict) or set(row) != (FIELDS | {'tag_colors'} if data['version'] == 2 else FIELDS):
                 raise ValueError()
             for field, maximum in [('title', 120), ('description', 500), ('code', 100000), ('language', 16)]:
-                if not isinstance(row[field], str) or len(row[field]) > maximum or '\x00' in row[field]:
+                if not isinstance(row[field], str) or len(row[field]) > maximum or '\x00' in row[field] or any(0xD800 <= ord(c) <= 0xDFFF for c in row[field]):
                     raise ValueError()
             if not row['title'].strip() or not row['code'] or row['language'] not in dict(LANGUAGES) or type(row['favorite']) is not bool:
                 raise ValueError()
             tags = row['tags']
-            if not isinstance(tags, list) or len(tags) > 10 or any(not isinstance(t, str) or not t or len(t) > 32 or ',' in t or '\x00' in t or t != t.strip().lower() for t in tags):
+            if not isinstance(tags, list) or len(tags) > 10 or any(not isinstance(t, str) or not t or len(t) > 32 or ',' in t or any(ord(c) < 32 or 0xD800 <= ord(c) <= 0xDFFF for c in t) or t != t.strip().lower() for t in tags):
                 raise ValueError()
             if len(set(tags)) != len(tags):
                 raise ValueError()
+            if data['version'] == 2:
+                colors = row['tag_colors']
+                if not isinstance(colors, dict) or set(colors) != set(tags) or not all(valid_color(value) for value in colors.values()):
+                    raise ValueError()
             for field in ['created_at', 'updated_at']:
                 if not isinstance(row[field], str) or len(row[field]) > 40:
                     raise ValueError()
@@ -122,7 +127,7 @@ def import_archive(user, archive, password):
                 skipped += 1
                 continue
             snippet = Snippet.objects.create(owner=user, **{key: row[key] for key in ['title', 'description', 'code', 'language', 'favorite']})
-            snippet.tags.set([Tag.objects.get_or_create(owner=user, name=name)[0] for name in row['tags']])
+            snippet.tags.set([Tag.objects.get_or_create(owner=user, name=name, defaults={'color': row['tag_colors'][name]} if 'tag_colors' in row else {})[0] for name in row['tags']])
             Snippet.objects.filter(pk=snippet.pk).update(created_at=row['created_at'], updated_at=row['updated_at'])
             existing.add(signature)
             created += 1

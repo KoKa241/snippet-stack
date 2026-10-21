@@ -12,8 +12,8 @@ class SnippetForm(forms.ModelForm):
     code = forms.CharField(
         label=_('Code'), strip=False, max_length=100000,
         widget=forms.Textarea(attrs={
-            'spellcheck': 'false', 'rows': 16,
-            'placeholder': _('# Your next useful snippet'),
+            'spellcheck': 'false', 'rows': 16, 'wrap': 'off', 'autocapitalize': 'off', 'autocorrect': 'off',
+            'placeholder': _('# Enter code...'),
         }),
     )
     tag_names = forms.CharField(
@@ -36,7 +36,7 @@ class SnippetForm(forms.ModelForm):
 
     def clean_tag_names(self):
         names = sorted(set(n.strip().lower() for n in self.cleaned_data['tag_names'].split(',') if n.strip()))
-        if len(names) > 10 or any(len(n) > 32 for n in names):
+        if len(names) > 10 or any(len(n) > 32 or any(ord(c) < 32 for c in n) for n in names):
             raise forms.ValidationError(_('Use up to 10 tags, each at most 32 characters long.'))
         return names
 

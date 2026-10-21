@@ -84,6 +84,51 @@ class SnippetTests(TestCase):
         for path in ['/new/', f'/snippets/{self.snippet.pk}/delete/', f'/snippets/{self.snippet.pk}/favorite/', '/logout/']:
             self.assertEqual(client.post(path, {}).status_code, 403)
 
+    def test_empty_post_shows_required_field_errors(self):
+        response = self.client.post('/new/', {})
+        self.assertTrue(response.context['form'].is_bound)
+        self.assertIn('title', response.context['form'].errors)
+        self.client.logout()
+        response = self.client.post('/register/', {})
+        self.assertIn('username', response.context['form'].errors)
+
+    def test_editor_rejects_control_characters_in_tags(self):
+        response = self.client.post('/new/', {
+            'title': 'Invalid tag', 'code': 'x', 'language': 'python',
+            'tag_names': 'bad\x01tag',
+        })
+        self.assertIn('tag_names', response.context['form'].errors)
+        self.assertFalse(Snippet.objects.filter(title='Invalid tag').exists())
+
+    def test_command_library_includes_powershell_and_keeps_language_filter(self):
+        Snippet.objects.create(owner=self.user, title='PowerShell command', code='Get-Process', language='powershell')
+        Snippet.objects.create(owner=self.user, title='Bash command', code='ls -la', language='shell')
+        response = self.client.get('/?view=terminal')
+        self.assertContains(response, 'PowerShell command')
+        self.assertContains(response, 'Bash command')
+        self.assertNotContains(response, 'HTTP retry')
+        self.assertEqual(response.context['terminals'], 2)
+        response = self.client.get('/?view=terminal&language=powershell')
+        self.assertContains(response, 'PowerShell command')
+        self.assertNotContains(response, 'Bash command')
+
+    def test_supported_languages_create_filter_and_roundtrip(self):
+        from .models import LANGUAGES
+        from .api import issue_key
+        from .backups import export_archive, import_archive
+        _, token = issue_key(self.user, 'Language test', 30)
+        for language, _ in LANGUAGES:
+            with self.subTest(language=language):
+                title = 'Language test ' + language
+                response = self.client.post('/new/', {'title': title, 'code': '<script>alert(1)</script>', 'language': language})
+                self.assertRedirects(response, '/')
+                response = self.client.get('/api/v1/snippets/', {'language': language}, HTTP_AUTHORIZATION='Bearer ' + token)
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(title, [row['title'] for row in response.json()['results']])
+        archive = export_archive(self.user, 'language roundtrip password')
+        import_archive(self.other, archive, 'language roundtrip password')
+        self.assertEqual(set(Snippet.objects.filter(owner=self.other, title__startswith='Language test ').values_list('language', flat=True)), set(dict(LANGUAGES)))
+
     def test_pagination(self):
         Snippet.objects.bulk_create([Snippet(owner=self.user, title=f'Item {i}', code='x') for i in range(15)])
         response = self.client.get('/')

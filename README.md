@@ -218,7 +218,7 @@ curl 'https://your-server.example/api/v1/snippets/42/' \
 | `page` | Page number, starting at 1 |
 | `page_size` | Results per page, 1–50; default 20 |
 
-The response contains `count`, `page`, `page_size`, `next_page`, `previous_page`, `semantic_status`, and `results`. Each result includes `id`, `title`, `description`, full `code`, `language`, `favorite`, `tags`, `created_at`, and `updated_at`. Search counts refer to retrieved candidates (up to 200), not the entire library. `GET /api/v1/snippets/{id}/` returns one such object. Unknown IDs and other users' snippets both return 404.
+The response contains `count`, `page`, `page_size`, `next_page`, `previous_page`, `semantic_status`, and `results`. Each result includes `id`, `title`, `description`, full `code`, `language`, `favorite`, `tags`, `tag_colors` (name-to-HEX mapping), `created_at`, and `updated_at`. Search counts refer to retrieved candidates (up to 200), not the entire library. `GET /api/v1/snippets/{id}/` returns one such object. Unknown IDs and other users' snippets both return 404.
 
 Errors use `{"error": {"code": "…", "message": "…"}}`: 400 for invalid parameters, 401 for invalid/expired/revoked keys, 404 for missing records/pages, 405 for unsupported methods, and 429 for rate limits. Each key allows 60 requests per fixed 60-second window, shared across web workers through the database. Successful authenticated responses include `X-RateLimit-Limit` and `X-RateLimit-Remaining`; 429 includes `Retry-After` in seconds. Responses are marked `Cache-Control: no-store`. No additional environment variables or services are required.
 
@@ -237,3 +237,17 @@ Upload the file with its password to restore into the currently signed-in accoun
 The portable v1 format uses AES-256-GCM with authenticated version/salt/nonce headers, random 16-byte salts and 12-byte nonces, and Argon2id password derivation (64 MiB, 3 passes, 4 lanes). Parameters are fixed by the version, not supplied by uploaded files. The cryptographic primitives come from [cryptography](https://cryptography.io/en/latest/hazmat/primitives/aead/). Archives are not compressed and contain UTF-8 JSON, never pickle or executable content. Each operation supports up to 2,000 snippets and a 10 MiB encrypted archive. Larger libraries need the database backup procedure above.
 
 Encryption/decryption occurs on the server: use HTTPS for remote access. Passwords and plaintext exports are not deliberately persisted to disk or the database; uploaded ciphertext may use Django's temporary upload storage. Endpoints require a signed-in browser session, POST, and CSRF protection; read-only API keys cannot export or import. No new environment variables are needed. If your reverse proxy limits request bodies, allow at least 11 MiB for multipart uploads. Rebuild the Docker image to install the new cryptography dependency.
+
+## Snippet editor and tag colors
+
+The editor uses a compact form with the language selector above the code field. Focus the tag input to see your existing tags; type to filter or choose **Add tag**. Arrow keys navigate suggestions, Enter selects or creates a tag, and Escape closes the list. Up to 10 tags can be attached. Without JavaScript, the ordinary comma-separated input remains usable.
+
+New tags receive a random pastel color. Click a selected chip's name to open its color dialog, with a live preview, preset swatches, a native color picker, and a HEX input. **Save** updates that tag everywhere in your account; **Cancel** or Escape discards the color change. Text switches between black and white to keep contrast with the chosen background. The chip's separate × button only removes the tag from the edited snippet. Tags are created immediately, even before saving the snippet, so unused tags remain available in the dropdown.
+
+Tag colors are scoped to the signed-in owner and validated as six-digit HEX values. Existing installations receive colors through migration `0006_tag_color`. Encrypted exports now use JSON payload version 2, including tag colors within the unchanged encryption envelope. Import still accepts version 1 archives, assigning new tags random colors. Existing tags keep their current colors during import, and colors do not affect snippet duplicate detection.
+
+### Syntax highlighting
+
+The library and editor highlight 31 programming languages, shells and data formats using a local PrismJS 1.30.0 bundle (MIT; `static/vendor/prism-LICENSE`). This includes Bash/terminal, PowerShell, C/C++, C#, Java, Go, Rust, PHP, Ruby, Swift, Kotlin, Dart, Lua, R, JSX/TSX, SCSS, TOML, XML, Markdown, Dockerfile and Nginx. Plain text remains available. The Commands view includes both Bash and PowerShell.
+
+Editor highlighting runs in a worker with a 1.5-second time limit; if highlighting fails or times out, the editable plain text remains visible. No code is sent to a CDN or executed. Apply migrations and run `collectstatic` when deploying.

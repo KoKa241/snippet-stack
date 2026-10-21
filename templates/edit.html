@@ -1,13 +1,44 @@
-{% extends 'base.html' %}{% load i18n %}
+{% extends 'base.html' %}{% load i18n static %}
 {% block title %}{% if snippet %}{% translate "Edit snippet" %}{% else %}{% translate "New snippet" %}{% endif %} · Snippet Stack{% endblock %}
+{% block extra_head %}<script src="{% static 'tags.js' %}" defer></script>{% endblock %}
 {% block content %}
-<header class="topbar"><a href="/">← {% translate "Library" %}</a><span>{% translate "Your next useful snippet" %}</span></header>
+<header class="topbar"><a href="/">← {% translate "Library" %}</a></header>
 <section class="content editor-content">
-  <div class="page-heading"><div><p class="eyebrow accent">{% translate "SAVE IT FOR LATER" %}</p><h1>{% if snippet %}{% translate "Edit snippet" %}{% else %}{% translate "New snippet" %}{% endif %}</h1><p class="muted">{% translate "Code, a command, or an idea — everything in its place." %}</p></div></div>
+  <div class="page-heading"><h1>{% if snippet %}{% translate "Edit snippet" %}{% else %}{% translate "New snippet" %}{% endif %}</h1></div>
   <form method="post" class="editor-form">{% csrf_token %}{{ form.non_field_errors }}
-    <div class="editor-metadata">{% for field in form %}{% if field.name != 'code' %}<div class="form-field field-{{ field.name }}">{{ field.label_tag }}{{ field }}{{ field.errors }}{% if field.help_text %}<small class="muted">{{ field.help_text }}</small>{% endif %}</div>{% endif %}{% endfor %}</div>
-    <div class="form-field code-field"><div class="editor-toolbar"><label for="id_code">〈/〉 {% translate "Code" %}</label><span>{% translate "Tab to indent · Ctrl/⌘ + Enter to save" %}</span></div>{{ form.code }}{{ form.code.errors }}</div>
-    <div class="editor-actions"><a class="button secondary" href="/">{% translate "Cancel" %}</a><button class="button primary" type="submit">{% translate "Save snippet" %} →</button></div>
+    <div class="editor-metadata">
+      <div class="form-field">{{ form.title.label_tag }}{{ form.title }}{{ form.title.errors }}</div>
+      <div class="form-field">{{ form.description.label_tag }}{{ form.description }}{{ form.description.errors }}</div>
+      <div class="form-field tag-field" id="tag-widget" data-create-url="{% url 'tag-create' %}" data-add="{% translate 'Add tag' %}" data-remove="{% translate 'Remove tag' %}" data-edit="{% translate 'Edit tag color' %}" data-empty="{% translate 'No matching tags' %}" data-limit="{% translate 'Select up to 10 tags.' %}" data-error="{% translate 'Could not save the tag. Please try again.' %}">
+        <label for="id_tag_names" id="tags-label">{% translate "Tags" %}</label>
+        <div class="selected-tags" id="selected-tags" hidden></div>
+        {{ form.tag_names }}{{ form.tag_names.errors }}
+        <div class="tag-enhancement" hidden>
+          <input type="text" id="tag-search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="tag-options" aria-labelledby="tags-label" aria-describedby="tag-help" autocomplete="off" maxlength="32" placeholder="{% translate 'Find or create a tag' %}">
+          <ul id="tag-options" role="listbox" aria-label="{% translate 'Tags' %}" hidden></ul>
+          <p id="tag-feedback" class="muted small" role="status"></p>
+        </div>
+        <small class="muted" id="tag-help">{% translate "Up to 10 tags. Click a selected tag to edit its color." %}</small>
+      </div>
+    </div>
+    <div class="form-field code-field">
+      <div class="editor-toolbar"><label for="id_code">{% translate "Code" %}</label><div class="editor-language">{{ form.language.label_tag }}{{ form.language }}{{ form.language.errors }}</div></div>
+      <div class="syntax-editor"><pre class="syntax-overlay" aria-hidden="true"><code></code></pre>{{ form.code }}</div>{{ form.code.errors }}
+    </div>
+    <p class="muted small editor-shortcuts">{% translate "Tab to indent · Ctrl/⌘ + Enter to save" %}</p>
+    <div class="editor-actions"><a class="button secondary" href="/">{% translate "Cancel" %}</a><button class="button primary" type="submit">{% translate "Save" %}</button></div>
   </form>
 </section>
+{{ available_tags|json_script:'available-tags' }}
+<dialog id="tag-color-dialog" aria-labelledby="tag-color-heading">
+  <form method="dialog" id="tag-color-form" novalidate>
+    <h2 id="tag-color-heading">{% translate "Tag color" %}</h2>
+    <p class="muted small">{% translate "Applies to this tag across your snippets." %}</p>
+    <span id="tag-color-preview" class="color-preview"></span>
+    <div class="color-palette" aria-label="{% translate 'Suggested colors' %}"></div>
+    <div class="color-inputs"><div class="form-field"><label for="tag-color-picker">{% translate "Color" %}</label><input id="tag-color-picker" type="color"></div><div class="form-field"><label for="tag-color-hex">HEX</label><input id="tag-color-hex" type="text" maxlength="7" spellcheck="false" autocomplete="off" aria-describedby="tag-color-error"></div></div>
+    <p id="tag-color-error" class="muted small" role="status" data-invalid="{% translate 'Enter a color in #RRGGBB format.' %}"></p>
+    <div class="dialog-actions"><button type="button" class="button secondary" id="cancel-tag-color">{% translate "Cancel" %}</button><button type="submit" class="button primary">{% translate "Save" %}</button></div>
+  </form>
+</dialog>
 {% endblock %}

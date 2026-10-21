@@ -178,7 +178,7 @@ class SearchMigrationTests(TransactionTestCase):
     def test_existing_snippets_and_tags_are_backfilled(self):
         executor = MigrationExecutor(connection)
         old_target = [('snippets', '0001_initial')]
-        new_target = [('snippets', '0005_apikey')]
+        new_target = executor.loader.graph.leaf_nodes('snippets')
         executor.migrate(old_target)
         try:
             apps = executor.loader.project_state(old_target).apps

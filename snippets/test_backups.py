@@ -34,6 +34,7 @@ class BackupTests(TestCase):
         restored = Snippet.objects.get(owner=self.other, title=self.snippet.title)
         self.assertEqual(record(restored), record(self.snippet))
         self.assertEqual(restored.tags.get().owner_id, self.other.pk)
+        self.assertEqual(restored.tags.get().color, self.snippet.tags.get().color)
         self.assertTrue(SearchDocument.objects.filter(snippet=restored).exists())
         self.assertEqual(import_archive(self.other, archive, self.password), (0, 1))
         self.assertTrue(Snippet.objects.filter(pk=self.private.pk).exists())
@@ -51,7 +52,7 @@ class BackupTests(TestCase):
     def test_entire_payload_validated_before_writing(self):
         valid = record(self.snippet)
         invalid = dict(valid, title='x' * 121)
-        for change in [{'favorite': 'false'}, {'owner': self.user.pk}, {'language': 'invalid'}, {'tags': ['a,b']}, {'tags': ['a'] * 11}, {'created_at': '2026-01-01'}, {'code': ''}]:
+        for change in [{'favorite': 'false'}, {'owner': self.user.pk}, {'language': 'invalid'}, {'tags': ['a,b']}, {'tags': ['a'] * 11}, {'created_at': '2026-01-01'}, {'code': ''}, {'code': '\ud800'}, {'title': '\udfff'}, {'tags': ['bad\x01tag']}, {'tags': ['\ud800']}]:
             with self.subTest(change=change):
                 rows = [valid, dict(valid, **change)]
                 archive = encrypt(json.dumps({'version': 1, 'snippets': rows}).encode(), self.password)
@@ -63,7 +64,7 @@ class BackupTests(TestCase):
         self.assertEqual(Snippet.objects.filter(owner=self.other).count(), 1)
 
     def test_invalid_payload_shapes_and_versions(self):
-        for data in [[], {}, {'version': True, 'snippets': []}, {'version': 2, 'snippets': []}, {'version': 1, 'snippets': {}}, {'version': 1, 'snippets': [None]}]:
+        for data in [[], {}, {'version': True, 'snippets': []}, {'version': 3, 'snippets': []}, {'version': 1, 'snippets': {}}, {'version': 1, 'snippets': [None]}]:
             with self.assertRaises(BackupError):
                 import_archive(self.other, encrypt(json.dumps(data).encode(), self.password), self.password)
 
@@ -115,3 +116,14 @@ class BackupTests(TestCase):
         row = record(self.snippet)
         archive = encrypt(json.dumps({'version': 1, 'snippets': [row, row]}).encode(), self.password)
         self.assertEqual(import_archive(self.other, archive, self.password), (1, 1))
+
+    def test_import_preserves_existing_tag_colors_and_rejects_invalid_colors(self):
+        existing = Tag.objects.create(owner=self.other, name='terminal', color='#112233')
+        archive = export_archive(self.user, self.password)
+        import_archive(self.other, archive, self.password)
+        existing.refresh_from_db()
+        self.assertEqual(existing.color, '#112233')
+        payload = json.loads(decrypt(archive, self.password))
+        payload['snippets'][0]['tag_colors']['terminal'] = 'red; color: black'
+        with self.assertRaises(BackupError):
+            import_archive(self.other, encrypt(json.dumps(payload).encode(), self.password), self.password)

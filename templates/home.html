@@ -26,8 +26,8 @@
         <form method="post" action="{% url 'favorite' snippet.pk %}">{% csrf_token %}<button class="icon-button star {% if snippet.favorite %}is-favorite{% endif %}" aria-label="{% if snippet.favorite %}{% translate "Remove from favorites" %}{% else %}{% translate "Add to favorites" %}{% endif %}">{% if snippet.favorite %}★{% else %}☆{% endif %}</button></form>
       </div>
       <a class="card-title" href="{% url 'edit' snippet.pk %}"><h2>{{ snippet.title }}</h2></a><p class="card-description">{{ snippet.description|default:no_description }}</p>
-      <div class="code-preview"><pre><code>{{ snippet.code|truncatechars:650 }}</code></pre><button class="copy-button" type="button" data-copy="{{ snippet.pk }}" aria-label="{% translate "Copy code" %}" title="{% translate "Copy code" %}">⧉</button></div>{{ snippet.code|json_script:snippet.pk }}
-      <div class="card-tags">{% for tag in snippet.tags.all %}<a href="/?tag={{ tag.name|urlencode }}"># {{ tag.name }}</a>{% empty %}<span class="muted small">{% translate "No tags" %}</span>{% endfor %}</div>
+      <div class="code-preview"><pre><code data-language="{{ snippet.language }}">{{ snippet.code|truncatechars:650 }}</code></pre><button class="copy-button" type="button" data-copy="{{ snippet.pk }}" aria-label="{% translate "Copy code" %}" title="{% translate "Copy code" %}">⧉</button></div>{{ snippet.code|json_script:snippet.pk }}
+      <div class="card-tags">{% for tag in snippet.tags.all %}<a class="tag-color-{{ tag.pk }}" href="/?tag={{ tag.name|urlencode }}"># {{ tag.name }}</a>{% empty %}<span class="muted small">{% translate "No tags" %}</span>{% endfor %}</div>
       <footer class="card-footer"><span>{% translate "Updated" %} {{ snippet.updated_at|date:'DATE_FORMAT' }}</span><div><a class="icon-button" href="{% url 'edit' snippet.pk %}" aria-label="{% translate "Edit" %} {{ snippet.title }}" title="{% translate "Edit" %}">✎</a><button class="icon-button delete-button" data-delete="{% url 'delete' snippet.pk %}" aria-label="{% translate "Delete" %} {{ snippet.title }}" title="{% translate "Delete" %}">⌫</button></div></footer>
     </article>
     {% empty %}
