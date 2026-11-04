@@ -17,7 +17,7 @@
   <script src="{% static 'vendor/prism.js' %}" data-manual defer></script>
   <script src="{% static 'syntax.js' %}" data-worker="{% static 'syntax-worker.js' %}" defer></script>
 </head>
-<body>
+<body data-error-heading="{% translate 'Please correct the following errors.' %}">
 <a class="skip-link" href="#main-content">{% translate "Skip to content" %}</a>
 {% if user.is_authenticated %}
 <aside class="sidebar">
@@ -25,9 +25,9 @@
   <div class="workspace"><span class="avatar">{{ user.username|first|upper }}</span><div>{{ user.username }}<small>{% translate "Personal workspace" %}</small></div><span class="workspace-lock">♧</span></div>
   <p class="eyebrow nav-label">{% translate "LIBRARY" %}</p>
   <nav>
-    <a class="nav-link {% if request.resolver_match.url_name == 'home' and not mode %}active{% endif %}" href="/"><span>▦</span> {% translate "All snippets" %} <b>{{ total|default:'0' }}</b></a>
-    <a class="nav-link {% if mode == 'favorites' %}active{% endif %}" href="/?view=favorites"><span>☆</span> {% translate "Favorites" %} <b>{{ favorites|default:'0' }}</b></a>
-    <a class="nav-link {% if mode == 'terminal' %}active{% endif %}" href="/?view=terminal"><span>›_</span> {% translate "Commands" %} <b>{{ terminals|default:'0' }}</b></a>
+    <a class="nav-link {% if request.resolver_match.url_name == 'home' and not mode and not tag %}active{% endif %}" href="/"><span>▦</span> <span class="nav-text">{% translate "All snippets" %}</span> <b>{{ total|default:'0' }}</b></a>
+    <a class="nav-link {% if mode == 'favorites' %}active{% endif %}" href="/?view=favorites"><span>☆</span> <span class="nav-text">{% translate "Favorites" %}</span> <b>{{ favorites|default:'0' }}</b></a>
+    <a class="nav-link {% if mode == 'terminal' %}active{% endif %}" href="/?view=terminal"><span>›_</span> <span class="nav-text">{% translate "Commands" %}</span> <b>{{ terminals|default:'0' }}</b></a>
   </nav>
   <p class="eyebrow nav-label">{% translate "TAGS" %} <span>#</span></p>
   <div class="tag-nav">{% for item in tags %}<a class="{% if tag == item.name %}selected{% endif %}" href="/?tag={{ item.name|urlencode }}"><span class="tag-dot tag-color-{{ item.pk }}" aria-hidden="true"></span>{{ item.name }}<small>{{ item.total }}</small></a>{% empty %}<p class="muted small">{% translate "Add tags when creating a snippet." %}</p>{% endfor %}</div>
@@ -40,15 +40,15 @@
   </div>
 </aside>
 {% endif %}
-<main id="main-content" class="{% if user.is_authenticated %}main{% else %}auth-main{% endif %}">
+<main tabindex="-1" id="main-content" class="{% if user.is_authenticated %}main{% else %}auth-main{% endif %}">
   {% if messages %}<div class="notifications" role="status">{% for message in messages %}<div class="notice">{{ message }}</div>{% endfor %}</div>{% endif %}
   {% block content %}{% endblock %}
 </main>
 <div class="toast" role="status" hidden data-copy-success="{% translate "Code copied" %}" data-copy-error="{% translate "Could not copy. Open the editor and copy the code manually." %}"></div>
-<dialog id="delete-dialog">
+<dialog id="delete-dialog" aria-labelledby="delete-heading" aria-describedby="delete-title delete-warning">
   <form method="post" id="delete-form">{% csrf_token %}
-    <div class="dialog-icon">⌫</div><h2>{% translate "Delete snippet?" %}</h2>
-    <p class="muted">{% translate "This action cannot be undone." %}</p>
+    <div class="dialog-icon" aria-hidden="true">⌫</div><h2 id="delete-heading">{% translate "Delete snippet?" %}</h2>
+    <p id="delete-title"></p><p class="muted" id="delete-warning">{% translate "This action cannot be undone." %}</p>
     <div class="dialog-actions"><button type="button" class="button secondary" id="cancel-delete">{% translate "Cancel" %}</button><button class="button danger">{% translate "Delete" %}</button></div>
   </form>
 </dialog>

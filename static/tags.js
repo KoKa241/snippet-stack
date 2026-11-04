@@ -124,6 +124,8 @@
   widget.addEventListener('focusout', event => { if (!widget.contains(event.relatedTarget)) close(); });
   document.addEventListener('pointerdown', event => { if (!widget.contains(event.target)) close(); });
   original.type = 'hidden'; original.required = false;
+  if (original.hasAttribute('aria-invalid')) input.setAttribute('aria-invalid', original.getAttribute('aria-invalid'));
+  input.setAttribute('aria-describedby', `tag-help ${(original.getAttribute('aria-describedby') || '').replace('id_tag_names_helptext', '')}`.trim());
   document.getElementById('tags-label').htmlFor = 'tag-search';
   widget.querySelector('.tag-enhancement').hidden = false; chips.hidden = false; render();
 })();

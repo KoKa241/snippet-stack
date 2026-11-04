@@ -814,3 +814,9 @@ msgstr "Получение одного сниппета с полным код�
 
 #~ msgid "Choose your interface language."
 #~ msgstr "Выберите язык интерфейса."
+
+msgid "Please correct the following errors."
+msgstr "Исправьте следующие ошибки."
+
+msgid "Tab to indent · Esc then Tab to leave · Ctrl/⌘ + Enter to save"
+msgstr "Tab — отступ · Esc, затем Tab — выход из поля · Ctrl/⌘ + Enter — сохранить"

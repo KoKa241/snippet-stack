@@ -25,7 +25,7 @@
       <div class="editor-toolbar"><label for="id_code">{% translate "Code" %}</label><div class="editor-language">{{ form.language.label_tag }}{{ form.language }}{{ form.language.errors }}</div></div>
       <div class="syntax-editor"><pre class="syntax-overlay" aria-hidden="true"><code></code></pre>{{ form.code }}</div>{{ form.code.errors }}
     </div>
-    <p class="muted small editor-shortcuts">{% translate "Tab to indent · Ctrl/⌘ + Enter to save" %}</p>
+    <p id="editor-shortcuts" class="muted small editor-shortcuts">{% translate "Tab to indent · Esc then Tab to leave · Ctrl/⌘ + Enter to save" %}</p>
     <div class="editor-actions"><a class="button secondary" href="/">{% translate "Cancel" %}</a><button class="button primary" type="submit">{% translate "Save" %}</button></div>
   </form>
 </section>

@@ -10,12 +10,13 @@
   <form class="filters" method="get" role="search">
     <input type="hidden" name="view" value="{{ mode }}"><input type="hidden" name="tag" value="{{ tag }}">
     <div class="search-field"><span aria-hidden="true">⌕</span><input type="search" name="q" id="search" value="{{ q }}" placeholder="{% translate "What do you want to do? Try freeing a port…" %}" aria-label="{% translate "Search snippets" %}"><kbd>/</kbd></div>
-    <select name="language" aria-label="{% translate "Language" %}" class="auto-submit"><option value="">{% translate "All languages" %}</option>{% for value,label in languages %}<option value="{{ value }}" {% if language == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
-    <select name="sort" aria-label="{% translate "Sort order" %}" class="auto-submit">
+    <select name="language" aria-label="{% translate "Language" %}" ><option value="">{% translate "All languages" %}</option>{% for value,label in languages %}<option value="{{ value }}" {% if language == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+    <select name="sort" aria-label="{% translate "Sort order" %}" >
       <option value="relevance" {% if sort == 'relevance' %}selected{% endif %}>{% if q %}{% translate "Relevance" %}{% else %}{% translate "Default order" %}{% endif %}</option>
       <option value="updated" {% if sort == 'updated' %}selected{% endif %}>{% translate "Recently updated" %}</option><option value="title" {% if sort == 'title' %}selected{% endif %}>{% translate "Title" %}</option>
     </select><button class="button secondary search-button">{% translate "Search" %}</button>
   </form>
+  {% if q or tag or language or mode %}<a class="button secondary reset-filters" href="/">{% translate "Reset filters" %}</a>{% endif %}
   {% if q %}<p class="search-status muted small" role="status">{% if search_status == 'ready' %}{% translate "Keyword and semantic search." %}{% elif search_status == 'indexing' %}{% translate "Semantic search is updating. New snippets are already searchable by keyword." %}{% elif search_status == 'unavailable' %}{% translate "Semantic search is temporarily unavailable. Showing keyword matches." %}{% else %}{% translate "Keyword search." %}{% endif %} {% translate "Up to 200 best matches." %}</p>{% endif %}
   <div class="results-heading"><span>{% if q %}{% blocktranslate %}Results for “{{ q }}”{% endblocktranslate %}{% else %}{% translate "Everything worth keeping" %}{% endif %}</span><span>{% translate "Found:" %} {{ page.paginator.count }} </span></div>
   {% translate "No description" as no_description %}
@@ -23,12 +24,12 @@
     {% for snippet in page %}
     <article class="snippet-card">
       <div class="card-top"><span class="language language-{{ snippet.language }}"><span class="language-symbol">{% if snippet.language == 'shell' %}›_{% elif snippet.language == 'python' %}Py{% elif snippet.language == 'javascript' %}JS{% else %}〈/〉{% endif %}</span>{{ snippet.get_language_display }}</span>
-        <form method="post" action="{% url 'favorite' snippet.pk %}">{% csrf_token %}<button class="icon-button star {% if snippet.favorite %}is-favorite{% endif %}" aria-label="{% if snippet.favorite %}{% translate "Remove from favorites" %}{% else %}{% translate "Add to favorites" %}{% endif %}">{% if snippet.favorite %}★{% else %}☆{% endif %}</button></form>
+        <form method="post" action="{% url 'favorite' snippet.pk %}">{% csrf_token %}<button class="icon-button star {% if snippet.favorite %}is-favorite{% endif %}" aria-pressed="{{ snippet.favorite|yesno:'true,false' }}" aria-label="{% if snippet.favorite %}{% translate "Remove from favorites" %}{% else %}{% translate "Add to favorites" %}{% endif %}">{% if snippet.favorite %}★{% else %}☆{% endif %}</button></form>
       </div>
       <a class="card-title" href="{% url 'edit' snippet.pk %}"><h2>{{ snippet.title }}</h2></a><p class="card-description">{{ snippet.description|default:no_description }}</p>
       <div class="code-preview"><pre><code data-language="{{ snippet.language }}">{{ snippet.code|truncatechars:650 }}</code></pre><button class="copy-button" type="button" data-copy="{{ snippet.pk }}" aria-label="{% translate "Copy code" %}" title="{% translate "Copy code" %}">⧉</button></div>{{ snippet.code|json_script:snippet.pk }}
       <div class="card-tags">{% for tag in snippet.tags.all %}<a class="tag-color-{{ tag.pk }}" href="/?tag={{ tag.name|urlencode }}"># {{ tag.name }}</a>{% empty %}<span class="muted small">{% translate "No tags" %}</span>{% endfor %}</div>
-      <footer class="card-footer"><span>{% translate "Updated" %} {{ snippet.updated_at|date:'DATE_FORMAT' }}</span><div><a class="icon-button" href="{% url 'edit' snippet.pk %}" aria-label="{% translate "Edit" %} {{ snippet.title }}" title="{% translate "Edit" %}">✎</a><button class="icon-button delete-button" data-delete="{% url 'delete' snippet.pk %}" aria-label="{% translate "Delete" %} {{ snippet.title }}" title="{% translate "Delete" %}">⌫</button></div></footer>
+      <footer class="card-footer"><span>{% translate "Updated" %} {{ snippet.updated_at|date:'DATE_FORMAT' }}</span><div><a class="icon-button" href="{% url 'edit' snippet.pk %}" aria-label="{% translate "Edit" %} {{ snippet.title }}" title="{% translate "Edit" %}">✎</a><button class="icon-button delete-button" data-delete-title="{{ snippet.title }}" data-delete="{% url 'delete' snippet.pk %}" aria-label="{% translate "Delete" %} {{ snippet.title }}" title="{% translate "Delete" %}">⌫</button></div></footer>
     </article>
     {% empty %}
     <div class="empty-state"><div class="empty-icon">〈/〉</div><p class="eyebrow accent">{% translate "YOUR PERSONAL TOOLKIT" %}</p>

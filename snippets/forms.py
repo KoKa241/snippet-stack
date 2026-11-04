@@ -12,7 +12,7 @@ class SnippetForm(forms.ModelForm):
     code = forms.CharField(
         label=_('Code'), strip=False, max_length=100000,
         widget=forms.Textarea(attrs={
-            'spellcheck': 'false', 'rows': 16, 'wrap': 'off', 'autocapitalize': 'off', 'autocorrect': 'off',
+            'aria-describedby': 'editor-shortcuts', 'spellcheck': 'false', 'rows': 16, 'wrap': 'off', 'autocapitalize': 'off', 'autocorrect': 'off',
             'placeholder': _('# Enter code...'),
         }),
     )
