@@ -1,5 +1,4 @@
-"""SQLite FTS5 BM25 + bounded-memory exact cosine retrieval + RRF."""
-import heapq
+"""SQLite FTS5 BM25 + sqlite-vec cosine retrieval + local E5 + RRF."""
 import logging
 import re
 import threading
@@ -19,23 +18,26 @@ _encoder_lock = threading.Lock()
 _retry_after = 0.0
 
 
-def get_encoder(*, download=False):
+def get_encoder():
     global _encoder, _retry_after
     with _encoder_lock:
         if _encoder is not None:
             return _encoder
-        if not download and time.monotonic() < _retry_after:
+        if time.monotonic() < _retry_after:
             raise RuntimeError('Semantic model is temporarily unavailable')
         try:
-            import onnxruntime
-            onnxruntime.disable_telemetry_events()
-            from fastembed import TextEmbedding
-            _encoder = TextEmbedding(
-                model_name=settings.SEARCH_MODEL,
-                cache_dir=settings.SEARCH_MODEL_CACHE,
-                threads=settings.SEARCH_THREADS,
-                local_files_only=not download,
+            import torch
+            from sentence_transformers import SentenceTransformer
+            torch.set_num_threads(settings.SEARCH_THREADS)
+            encoder = SentenceTransformer(
+                str(settings.SEARCH_MODEL_PATH), device='cpu', local_files_only=True,
+                trust_remote_code=False,
             )
+            if encoder.get_sentence_embedding_dimension() != 384:
+                raise ValueError('Expected a 384-dimensional E5 model')
+            encoder.prompts = {}
+            encoder.default_prompt_name = None
+            _encoder = encoder
         except Exception:
             _retry_after = time.monotonic() + 60
             raise
@@ -53,13 +55,18 @@ def normalize(vectors):
 
 
 def encode_documents(texts):
-    return normalize(list(get_encoder().embed(texts, batch_size=32)))
+    return normalize(get_encoder().encode(
+        ['passage: ' + text for text in texts], batch_size=32,
+        convert_to_numpy=True, show_progress_bar=False,
+    ))
 
 
 @lru_cache(maxsize=128)
 def encode_query(text):
     # Memory-only cache; this module never persists query text.
-    return normalize(list(get_encoder().query_embed(text)))[0]
+    return normalize(get_encoder().encode(
+        ['query: ' + text], convert_to_numpy=True, show_progress_bar=False,
+    ))[0]
 
 
 def fts_query(text):
@@ -90,38 +97,32 @@ def vector_candidates(queryset, text, limit):
     ).order_by('pk').values_list('snippet_id', 'embedding')
     if not documents.exists():
         return []
-    query = encode_query(text)
-    # No ANN truncation before owner/tag/language filtering; never load other users' vectors.
-    best, batch = [], []
-
-    def score_batch(rows):
-        ids, vectors = [], []
-        for pk, blob in rows:
-            if len(blob) != 384 * 4:
-                continue
-            vector = np.frombuffer(blob, dtype='<f4')
-            if np.isfinite(vector).all():
-                ids.append(pk)
-                vectors.append(vector)
-        if not vectors:
-            return
-        scores = np.stack(vectors) @ query
-        for pk, score in zip(ids, scores, strict=True):
-            if score < settings.SEARCH_MIN_SIMILARITY:
-                continue
-            entry = (float(score), -pk)
-            if len(best) < limit:
-                heapq.heappush(best, entry)
-            elif entry > best[0]:
-                heapq.heapreplace(best, entry)
-
-    for row in documents.iterator(chunk_size=256):
-        batch.append(row)
-        if len(batch) == 256:
-            score_batch(batch)
-            batch.clear()
-    score_batch(batch)
-    return [-pk for _, pk in sorted(best, reverse=True)]
+    query = encode_query(text).astype('<f4').tobytes()
+    # Load the trusted packaged extension only when semantic retrieval is needed.
+    # Existing BLOB storage remains authoritative: edits/deletes invalidate it atomically.
+    import sqlite_vec
+    connection.ensure_connection()
+    db = connection.connection
+    try:
+        db.execute('SELECT vec_version()')
+    except Exception:
+        db.enable_load_extension(True)
+        try:
+            sqlite_vec.load(db)
+        finally:
+            db.enable_load_extension(False)
+    sql, params = documents.query.sql_with_params()
+    with connection.cursor() as cursor:
+        cursor.execute(
+            f"""SELECT snippet_id FROM (
+                SELECT snippet_id, vec_distance_cosine(embedding, %s) AS distance
+                FROM ({sql}) AS eligible
+                WHERE length(embedding) = 1536
+            ) WHERE distance <= %s
+            ORDER BY distance, snippet_id LIMIT %s""",
+            [query, *params, 1 - settings.SEARCH_MIN_SIMILARITY, limit],
+        )
+        return [row[0] for row in cursor.fetchall()]
 
 
 def reciprocal_rank_fusion(*rankings, k=60):

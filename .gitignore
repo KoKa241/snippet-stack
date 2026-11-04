@@ -10,3 +10,5 @@ staticfiles/
 *.sqlite3-*
 
 *.ssbackup
+
+models/

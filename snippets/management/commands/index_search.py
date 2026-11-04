@@ -8,7 +8,7 @@ from snippets.models import SearchDocument
 
 
 class Command(BaseCommand):
-    help = 'Download/cache the local model and index missing or changed snippets.'
+    help = 'Load the local E5 model and index missing or changed snippets.'
 
     def add_arguments(self, parser):
         parser.add_argument('--watch', action='store_true', help='Poll every 3 seconds; retry temporary failures.')
@@ -31,7 +31,7 @@ class Command(BaseCommand):
             return
         while True:
             try:
-                get_encoder(download=True)
+                get_encoder()
                 count = index_batch()
                 if count:
                     self.stdout.write(f'Indexed {count} snippets.')

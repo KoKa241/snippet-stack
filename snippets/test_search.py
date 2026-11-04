@@ -138,6 +138,44 @@ class SearchTests(TestCase):
         self.assertIsNone(SearchDocument.objects.get(pk=self.command.pk).embedding)
         self.assertIsNotNone(SearchDocument.objects.get(pk=self.python.pk).embedding)
 
+    @override_settings(SEARCH_SEMANTIC_ENABLED=True)
+    @patch('snippets.search.encode_query', return_value=vector())
+    def test_old_model_vectors_are_excluded(self, encode):
+        self.embed(self.command)
+        SearchDocument.objects.filter(pk=self.command.pk).update(embedding_model='old-model')
+        result = self.search('unrelatedquery')
+        self.assertEqual(result.ids, [])
+        self.assertEqual(result.semantic_status, 'indexing')
+        encode.assert_not_called()
+
+    @patch('snippets.search.get_encoder')
+    def test_e5_prefixes_match_training(self, encoder):
+        from .search import encode_documents, encode_query
+        encoder.return_value.encode.return_value = np.stack([vector()])
+        encode_documents(['document'])
+        self.assertEqual(encoder.return_value.encode.call_args.args[0], ['passage: document'])
+        encode_query.cache_clear()
+        encode_query('question')
+        self.assertEqual(encoder.return_value.encode.call_args.args[0], ['query: question'])
+        encode_query.cache_clear()
+
+    @override_settings(SEARCH_SEMANTIC_ENABLED=True)
+    @patch('sqlite_vec.load', side_effect=RuntimeError('extension unavailable'))
+    @patch('snippets.search.encode_query', return_value=vector())
+    def test_extension_failure_preserves_keyword_results(self, encode, load):
+        self.embed(self.command)
+        # A fresh connection is covered by deployment; force the loader path here.
+        with patch('snippets.search.connection') as mocked:
+            mocked.connection.execute.side_effect = RuntimeError('not loaded')
+            from .search import vector_candidates
+            with self.assertRaises(RuntimeError):
+                vector_candidates(Snippet.objects.filter(owner=self.user), 'lsof', 10)
+            mocked.connection.enable_load_extension.assert_called_with(False)
+        with patch('snippets.search.vector_candidates', side_effect=RuntimeError('extension unavailable')):
+            result = self.search('lsof')
+        self.assertEqual(result.ids, [self.command.pk])
+        self.assertEqual(result.semantic_status, 'unavailable')
+
     def test_search_page_and_language_filter(self):
         self.client.force_login(self.user)
         response = self.client.get('/?q=lsof')
@@ -147,8 +185,8 @@ class SearchTests(TestCase):
         self.assertNotContains(self.client.get('/?q=lsof&language=python'), 'Free port')
 
 
-# Explicit opt-in: uses the cached real ONNX model, never downloads during tests.
-@skipUnless(os.getenv('RUN_SEMANTIC_TESTS') == '1', 'Set RUN_SEMANTIC_TESTS=1 after index_search downloads the model')
+# Explicit opt-in: uses the local trained E5 model, never downloads during tests.
+@skipUnless(os.getenv('RUN_SEMANTIC_TESTS') == '1', 'Set RUN_SEMANTIC_TESTS=1 with the local trained model installed')
 @override_settings(SEARCH_SEMANTIC_ENABLED=True, AXES_ENABLED=False)
 class RealSemanticSearchTests(TestCase):
     def test_russian_query_finds_english_command_end_to_end(self):
